@@ -1,11 +1,7 @@
-version: "3.8"
 services:
-  # Database
   db:
     container_name: glinteco_db
     image: mysql:8.0
-    networks:
-      fdo_network:
     ports:
       - "3306:3306"
     volumes:
