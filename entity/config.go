@@ -5,5 +5,11 @@ type MysqlConfig struct {
 	Port     int    `env:"DB_PORT" env-default:"3306"`
 	User     string `env:"DB_USER"`
 	Password string `env:"DB_PASSWORD"`
-	Name     string `env:"DB_NAME"`
+	DBName   string `env:"DB_NAME"`
+}
+
+type ServerConfig struct {
+	Host      string `env:"HOST"`
+	Port      int    `env:"PORT"`
+	JWTSecret string `env:"JWT_SECRET"`
 }
