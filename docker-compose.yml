@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  # Database
+  db:
+    container_name: glinteco_db
+    image: mysql:8.0
+    networks:
+      fdo_network:
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./dbcache:/var/lib/mysql
+    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+    environment:
+      MYSQL_ROOT_PASSWORD: 'glinteco@123'
+      MYSQL_DATABASE: 'glinteco_db'
+      MYSQL_USER: 'glinteco'
+      MYSQL_PASSWORD: 'glinteco@123'
