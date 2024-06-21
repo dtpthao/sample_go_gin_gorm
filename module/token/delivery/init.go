@@ -1,8 +1,10 @@
 package delivery
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"glintecoTask/entity"
+	"glintecoTask/utils"
 	"net/http"
 	"strings"
 )
@@ -27,13 +29,13 @@ func (h TokenHandler) Authenticate(c *gin.Context) {
 
 	token, err := h.tuc.Verify(tokenString)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		utils.HandleError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	user, err := h.uuc.GetDetails(token.Username)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		utils.HandleError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -46,12 +48,12 @@ func (h TokenHandler) AdminAuthorize(c *gin.Context) {
 
 	isAdmin, ok := c.Get("isAdmin")
 	if !ok {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		utils.HandleError(c, http.StatusInternalServerError, errors.New("cannot get role in middleware"))
 		return
 	}
 
 	if !isAdmin.(bool) {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		utils.HandleError(c, http.StatusUnauthorized, errors.New("unauthorized"))
 		return
 	}
 
