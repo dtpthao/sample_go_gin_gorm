@@ -83,7 +83,39 @@ func (h UserHandler) GetListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func (h UserHandler) UpdateUser(c *gin.Context) {}
+type UpdateUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"is_admin"`
+}
+
+func (h UserHandler) UpdateUser(c *gin.Context) {
+
+	uuid := c.Param("uuid")
+
+	var uReg UpdateUserRequest
+	err := c.ShouldBindJSON(&uReg)
+	if err != nil {
+		utils.HandleError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	// todo validate input
+	user := entity.User{
+		Uuid:     uuid,
+		Username: uReg.Username,
+		Password: uReg.Password,
+		IsAdmin:  uReg.IsAdmin,
+	}
+
+	updatedUser, err := h.uc.Update(user)
+	if err != nil {
+		utils.HandleError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedUser)
+}
 
 func (h UserHandler) GetUserDetail(c *gin.Context) {}
 

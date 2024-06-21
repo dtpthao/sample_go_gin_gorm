@@ -16,8 +16,7 @@ func (uc UserUseCase) GetList() ([]entity.User, error) {
 }
 
 func (uc UserUseCase) Update(u entity.User) (*entity.User, error) {
-	//TODO implement me
-	panic("implement me")
+	return uc.repo.Update(u)
 }
 
 func (uc UserUseCase) Delete(username string) error {

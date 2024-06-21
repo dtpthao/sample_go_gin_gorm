@@ -79,6 +79,27 @@ func (r UserRepository) GetList() ([]entity.User, error) {
 }
 
 func (r UserRepository) Update(u entity.User) (*entity.User, error) {
-	//TODO implement me
-	panic("implement me")
+
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	res := tx.Table(TableUsers).Where("uuid = ?", u.Uuid).Updates(&u)
+	if res.Error != nil {
+		tx.Rollback()
+		return nil, res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		tx.Rollback()
+		return nil, errors.New("failed to update user")
+	}
+
+	if tx.Commit().Error != nil {
+		tx.Rollback()
+		return nil, errors.New("cannot commit transaction")
+	}
+
+	return &u, nil
 }
