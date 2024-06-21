@@ -12,8 +12,7 @@ type UserUseCase struct {
 }
 
 func (uc UserUseCase) GetList() ([]entity.User, error) {
-	//TODO implement me
-	panic("implement me")
+	return uc.repo.GetList()
 }
 
 func (uc UserUseCase) Update(u entity.User) (*entity.User, error) {

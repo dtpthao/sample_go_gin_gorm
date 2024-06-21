@@ -74,8 +74,13 @@ func (h UserHandler) CreateUser(c *gin.Context) {
 }
 
 func (h UserHandler) GetListUsers(c *gin.Context) {
-	//res, err := h.uc.GetList()
+	res, err := h.uc.GetList()
+	if err != nil {
+		utils.HandleError(c, http.StatusInternalServerError, err)
+		return
+	}
 
+	c.JSON(http.StatusOK, res)
 }
 
 func (h UserHandler) UpdateUser(c *gin.Context) {}
