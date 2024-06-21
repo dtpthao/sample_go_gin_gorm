@@ -19,7 +19,7 @@ type ContractRepository struct {
 	db        *gorm.DB
 }
 
-func NewContractRepository(db *gorm.DB) ContractRepository {
+func NewContractRepository(db *gorm.DB) entity.IContractRepository {
 	return ContractRepository{db: db}
 }
 
@@ -106,6 +106,28 @@ func (r ContractRepository) Delete(cUuid string) error {
 	}
 
 	err := r.db.Table(TableContract).Delete(&c).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if tx.Commit().Error != nil {
+		tx.Rollback()
+		return errors.New("cannot commit transaction")
+	}
+
+	return nil
+}
+
+func (r ContractRepository) DeleteByUser(cUuid string, uUuid string) error {
+	c := ContractRepository{Uuid: cUuid}
+
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	err := r.db.Table(TableContract).Where("uuid = ? and user_uuid = ?", cUuid, uUuid).Delete(&c).Error
 	if err != nil {
 		tx.Rollback()
 		return err
