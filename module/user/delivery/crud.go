@@ -8,24 +8,8 @@ import (
 	"net/http"
 )
 
-type UserLogin struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-func (ul UserLogin) ToEntity() entity.User {
-	return entity.User{
-		Username: ul.Username,
-		Password: ul.Password,
-	}
-}
-
-type LoginResponse struct {
-	Token string `json:"token"`
-}
-
 func (h UserHandler) Login(c *gin.Context) {
-	var userRegister UserLogin
+	var userRegister entity.UserLogin
 	err := c.ShouldBindJSON(&userRegister)
 	if err != nil {
 		utils.HandleError(c, http.StatusBadRequest, err)
@@ -38,17 +22,11 @@ func (h UserHandler) Login(c *gin.Context) {
 		utils.HandleError(c, http.StatusBadRequest, err)
 		return
 	}
-	c.JSON(http.StatusOK, LoginResponse{Token: token})
-}
-
-type NewUserRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	IsAdmin  bool   `json:"is_admin"`
+	c.JSON(http.StatusOK, entity.LoginResponse{Token: token})
 }
 
 func (h UserHandler) CreateUser(c *gin.Context) {
-	var userReq NewUserRequest
+	var userReq entity.NewUserRequest
 	err := c.ShouldBindJSON(&userReq)
 	if err != nil {
 		utils.HandleError(c, http.StatusBadRequest, err)
@@ -83,17 +61,11 @@ func (h UserHandler) GetListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-type UpdateUserRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	IsAdmin  bool   `json:"is_admin"`
-}
-
 func (h UserHandler) UpdateUser(c *gin.Context) {
 
 	uUuid := c.Param("uuid")
 
-	var uReg UpdateUserRequest
+	var uReg entity.UpdateUserRequest
 	err := c.ShouldBindJSON(&uReg)
 	if err != nil {
 		utils.HandleError(c, http.StatusBadRequest, err)
@@ -129,10 +101,6 @@ func (h UserHandler) GetUserInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-type DeleteUserResponse struct {
-	Success bool `json:"succcess"`
-}
-
 func (h UserHandler) DeleteUser(c *gin.Context) {
 	uUid := c.Param("uuid")
 	err := h.uc.Delete(uUid)
@@ -141,7 +109,7 @@ func (h UserHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, DeleteUserResponse{Success: true})
+	c.JSON(http.StatusNoContent, entity.DeleteUserResponse{Success: true})
 }
 
 func (h UserHandler) Logout(c *gin.Context) {

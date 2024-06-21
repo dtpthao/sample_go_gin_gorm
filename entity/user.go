@@ -33,3 +33,35 @@ type IUserUseCase interface {
 	Update(u User) error
 	Delete(uuid string) error
 }
+
+type UserLogin struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func (ul UserLogin) ToEntity() User {
+	return User{
+		Username: ul.Username,
+		Password: ul.Password,
+	}
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
+type NewUserRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	IsAdmin  bool   `json:"is_admin"`
+}
+
+type UpdateUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"is_admin"`
+}
+
+type DeleteUserResponse struct {
+	Success bool `json:"succcess"`
+}
