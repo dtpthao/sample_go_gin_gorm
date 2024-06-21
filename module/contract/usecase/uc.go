@@ -1,30 +1,46 @@
 package usecase
 
-import "glintecoTask/entity"
+import (
+	"github.com/google/uuid"
+	"glintecoTask/entity"
+)
 
-type ContractUseCase struct{}
-
-func (ContractUseCase) CreateNew(c entity.NewContractRequest) (*entity.Contract, error) {
-	//TODO implement me
-	panic("implement me")
+type ContractUseCase struct {
+	repo entity.IContractRepository
 }
 
-func (ContractUseCase) GetListByUser() ([]entity.Contract, error) {
-	//TODO implement me
-	panic("implement me")
+func NewContractUseCase(r entity.IContractRepository) entity.IContractUseCase {
+	return &ContractUseCase{repo: r}
 }
 
-func (ContractUseCase) Update(c entity.UpdateContractRequest) error {
-	//TODO implement me
-	panic("implement me")
+func (uc ContractUseCase) CreateNew(c entity.NewContractRequest) (*entity.Contract, error) {
+
+	contract := entity.Contract{
+		Uuid:     uuid.New().String(),
+		Name:     c.Name,
+		UserUuid: c.UserUuid,
+		Details:  c.Details,
+	}
+
+	return uc.repo.Add(contract)
 }
 
-func (ContractUseCase) GetDetails(cUuid string) (*entity.Contract, error) {
-	//TODO implement me
-	panic("implement me")
+func (uc ContractUseCase) GetListByUser(userUuid string) ([]entity.Contract, error) {
+	return uc.repo.GetListByUser(userUuid)
 }
 
-func (ContractUseCase) Delete(cUuid string) error {
-	//TODO implement me
-	panic("implement me")
+func (uc ContractUseCase) Update(c entity.UpdateContractRequest) error {
+	return uc.repo.Update(c.Uuid, c.ToMap())
+}
+
+func (uc ContractUseCase) GetDetails(cUuid string) (*entity.Contract, error) {
+	return uc.repo.GetDetails(cUuid)
+}
+
+func (uc ContractUseCase) Delete(cUuid string) error {
+	return uc.repo.Delete(cUuid)
+}
+
+func (uc ContractUseCase) DeleteByUser(cUuid string, uUuid string) error {
+	return uc.repo.DeleteByUser(cUuid, uUuid)
 }

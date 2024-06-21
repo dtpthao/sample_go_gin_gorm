@@ -23,6 +23,13 @@ type UpdateContractRequest struct {
 	Details any    `json:"details"`
 }
 
+func (u UpdateContractRequest) ToMap() map[string]any {
+	return map[string]any{
+		"name":    u.Name,
+		"details": u.Details,
+	}
+}
+
 type UpdateContractResponse struct {
 	Success bool `json:"success"`
 }
@@ -51,7 +58,7 @@ type IContractRepository interface {
 	Add(c Contract) (*Contract, error)
 	GetListByUser(userUuid string) ([]Contract, error)
 	GetList() ([]Contract, error)
-	Update(c Contract) error
+	Update(cUuid string, data any) error
 	GetDetails(cUuid string) (*Contract, error)
 	DeleteByUser(cUuid string, uUuid string) error
 	Delete(cUuid string) error

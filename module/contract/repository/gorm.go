@@ -63,13 +63,13 @@ func (r ContractRepository) GetList() ([]entity.Contract, error) {
 	return contracts, err
 }
 
-func (r ContractRepository) Update(c entity.Contract) error {
+func (r ContractRepository) Update(cUuid string, data any) error {
 	tx := r.db.Begin()
 	if tx.Error != nil {
 		return tx.Error
 	}
 
-	res := tx.Table(TableContract).Where("uuid = ?", c.Uuid).Updates(c)
+	res := tx.Table(TableContract).Where("uuid = ?", cUuid).Updates(data)
 	if res.Error != nil {
 		tx.Rollback()
 		return res.Error
