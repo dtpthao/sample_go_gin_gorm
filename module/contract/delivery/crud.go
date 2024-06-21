@@ -18,6 +18,17 @@ func (h ContractHandler) CreateNew(context *gin.Context) {
 		return
 	}
 
+	userUuid, _, err := utils.GetMiddlewareValues(context)
+	if err != nil {
+		utils.HandleError(context, http.StatusInternalServerError, err)
+		return
+	}
+
+	if userUuid != cReq.UserUuid {
+		utils.HandleError(context, http.StatusBadRequest, errors.New("you cannot create contract for other staff"))
+		return
+	}
+
 	newContract, err := h.uc.CreateNew(cReq)
 	if err != nil {
 		utils.HandleError(context, http.StatusInternalServerError, err)
