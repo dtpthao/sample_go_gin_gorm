@@ -18,8 +18,17 @@ type NewContractRequest struct {
 }
 
 type UpdateContractRequest struct {
+	Uuid    string `json:"uuid" binding:"required"`
 	Name    string `json:"name"`
 	Details any    `json:"details"`
+}
+
+type UpdateContractResponse struct {
+	Success bool `json:"success"`
+}
+
+type DeleteContractResponse struct {
+	Success bool `json:"success"`
 }
 
 //- As a staff, I can create/update/view list/view detail/delete contracts.
@@ -31,9 +40,10 @@ type UpdateContractRequest struct {
 
 type IContractUseCase interface {
 	CreateNew(c NewContractRequest) (*Contract, error)
-	GetList() ([]Contract, error)
+	GetListByUser(userUuid string) ([]Contract, error)
 	Update(c UpdateContractRequest) error
 	GetDetails(cUuid string) (*Contract, error)
+	DeleteByUser(cUuid string, uUuid string) error
 	Delete(cUuid string) error
 }
 
@@ -43,5 +53,6 @@ type IContractRepository interface {
 	GetList() ([]Contract, error)
 	Update(c Contract) error
 	GetDetails(cUuid string) (*Contract, error)
+	DeleteByUser(cUuid string, uUuid string) error
 	Delete(cUuid string) error
 }

@@ -9,7 +9,7 @@ func (ContractUseCase) CreateNew(c entity.NewContractRequest) (*entity.Contract,
 	panic("implement me")
 }
 
-func (ContractUseCase) GetList() ([]entity.Contract, error) {
+func (ContractUseCase) GetListByUser() ([]entity.Contract, error) {
 	//TODO implement me
 	panic("implement me")
 }

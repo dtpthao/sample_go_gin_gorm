@@ -39,6 +39,7 @@ func (h TokenHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
+	c.Set("userUuid", user.Uuid)
 	c.Set("username", user.Username)
 	c.Set("isAdmin", user.IsAdmin)
 	c.Next()
