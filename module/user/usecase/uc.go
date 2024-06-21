@@ -24,8 +24,8 @@ func (uc UserUseCase) Update(u entity.User) error {
 	return uc.repo.Update(u.Uuid, data)
 }
 
-func (uc UserUseCase) Delete(username string) error {
-	return uc.repo.Delete(username)
+func (uc UserUseCase) Delete(userUuid string) error {
+	return uc.repo.Delete(userUuid)
 }
 
 func NewUserUseCase(r entity.IUserRepo, tuc entity.ITokenUseCase) entity.IUserUseCase {

@@ -122,14 +122,27 @@ func (h UserHandler) GetUserInfo(c *gin.Context) {
 	uUuid := c.Param("uuid")
 	user, err := h.uc.GetUserByUuid(uUuid)
 	if err != nil {
-		utils.HandleError(c, http.StatusBadRequest, err) // todo error can be either BadRequest or Internal
+		utils.HandleError(c, http.StatusBadRequest, err) // fixme error can be either BadRequest or Internal
 		return
 	}
 
 	c.JSON(http.StatusOK, user)
 }
 
-func (h UserHandler) DeleteUser(c *gin.Context) {}
+type DeleteUserResponse struct {
+	Success bool `json:"succcess"`
+}
+
+func (h UserHandler) DeleteUser(c *gin.Context) {
+	uUid := c.Param("uuid")
+	err := h.uc.Delete(uUid)
+	if err != nil {
+		utils.HandleError(c, http.StatusBadRequest, err) // fixme status can be either BadRequest or Internal error
+		return
+	}
+
+	c.JSON(http.StatusNoContent, DeleteUserResponse{Success: true})
+}
 
 func (h UserHandler) Logout(c *gin.Context) {
 	// todo

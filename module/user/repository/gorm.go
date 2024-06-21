@@ -68,14 +68,25 @@ func (r UserRepository) GetUserByUuid(uuid string) (*entity.User, error) {
 	return res.ToEntity(), nil
 }
 
-func (r UserRepository) Delete(username string) error {
-	res := r.db.Model(&UserRepository{}).Where("username = ?", username).Set("active", false)
+func (r UserRepository) Delete(uuid string) error {
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	res := tx.Table(TableUsers).Where("uuid = ?", uuid).Update("active", false)
 	if res.Error != nil {
 		return res.Error
 	}
 
 	if res.RowsAffected == 0 {
-		return errors.New("failed to delete user")
+		tx.Rollback()
+		return errors.New("failed to update user")
+	}
+
+	if tx.Commit().Error != nil {
+		tx.Rollback()
+		return errors.New("cannot commit transaction")
 	}
 
 	return nil
