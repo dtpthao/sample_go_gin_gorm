@@ -35,8 +35,11 @@ func NewUserUseCase(r entity.IUserRepo, tuc entity.ITokenUseCase) entity.IUserUs
 func (uc UserUseCase) Create(u entity.User) (*entity.User, error) {
 	_, err := uc.repo.GetDetails(u.Username)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		// todo hash password
 		return uc.repo.Create(u)
+	}
+
+	if err == nil {
+		return nil, errors.New("user already exist")
 	}
 	return nil, err
 }

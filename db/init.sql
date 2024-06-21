@@ -1,5 +1,3 @@
--- USE 'glinteco_db'
-
 CREATE TABLE users
 (
     uuid       VARCHAR(36) UNIQUE PRIMARY KEY NOT NULL,

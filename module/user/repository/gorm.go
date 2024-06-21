@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	"glintecoTask/entity"
 	"gorm.io/gorm"
 	"time"
@@ -47,7 +46,6 @@ func (r UserRepository) ToEntity() *entity.User {
 
 func (r UserRepository) Create(u entity.User) (*entity.User, error) {
 	ur := r.FromEntity(u)
-	ur.Uuid = uuid.New().String()
 	err := r.db.Table(TableUsers).Create(&ur).Error
 	return ur.ToEntity(), err
 }
