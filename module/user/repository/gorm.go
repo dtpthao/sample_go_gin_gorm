@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"glintecoTask/entity"
 	"gorm.io/gorm"
@@ -44,17 +45,14 @@ func (r UserRepository) ToEntity() *entity.User {
 	}
 }
 
-func (r UserRepository) Create(u entity.User) error {
+func (r UserRepository) Create(u entity.User) (*entity.User, error) {
 	ur := r.FromEntity(u)
 	ur.Uuid = uuid.New().String()
 	err := r.db.Table(TableUsers).Create(&ur).Error
-	if err != nil {
-		return err
-	}
-	return nil
+	return ur.ToEntity(), err
 }
 
-func (r UserRepository) FindByUsername(username string) (*entity.User, error) {
+func (r UserRepository) GetDetails(username string) (*entity.User, error) {
 	var res UserRepository
 	err := r.db.Table(TableUsers).Where("username = ?", username).Take(&res).Error
 	if err != nil {
@@ -63,10 +61,26 @@ func (r UserRepository) FindByUsername(username string) (*entity.User, error) {
 	return res.ToEntity(), nil
 }
 
-func (r UserRepository) DeleteByUsername(username string) error {
-	err := r.db.Model(&UserRepository{}).Where("username = ?", username).Set("active", false).Error
-	if err != nil {
-		return err
+func (r UserRepository) Delete(username string) error {
+	res := r.db.Model(&UserRepository{}).Where("username = ?", username).Set("active", false)
+	if res.Error != nil {
+		return res.Error
 	}
+
+	if res.RowsAffected == 0 {
+		return errors.New("failed to delete user")
+	}
+
 	return nil
+}
+
+func (r UserRepository) GetList() ([]entity.User, error) {
+	var users []entity.User
+	err := r.db.Table(TableUsers).Find(&users).Error
+	return users, err
+}
+
+func (r UserRepository) Update(u entity.User) (*entity.User, error) {
+	//TODO implement me
+	panic("implement me")
 }

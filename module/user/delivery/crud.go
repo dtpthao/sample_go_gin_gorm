@@ -32,8 +32,37 @@ func (h UserHandler) Login(c *gin.Context) {
 
 	// todo need to invalidate token when logout
 	token, err := h.uc.Login(userRegister.ToEntity())
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
 	c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
+
+func (h UserHandler) CreateUser(c *gin.Context) {
+	var userReq entity.User
+	err := c.ShouldBindJSON(&userReq)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	user, err := h.uc.Create(userReq)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func (h UserHandler) GetListUsers(c *gin.Context) {}
+
+func (h UserHandler) UpdateUser(c *gin.Context) {}
+
+func (h UserHandler) GetUserDetail(c *gin.Context) {}
+
+func (h UserHandler) DeleteUser(c *gin.Context) {}
 
 func (h UserHandler) Logout(c *gin.Context) {
 	// todo

@@ -13,15 +13,24 @@ type UserHandler struct {
 func NewUserHandler(app *gin.Engine, uc entity.IUserUseCase) UserHandler {
 	return UserHandler{
 		uc:     uc,
-		router: app.Group("/accounts/"),
+		router: app.Group("/"),
 	}
 }
 
-func (h UserHandler) RegisterHandler() {
-	h.router.POST("/login", h.Login)
-	//h.router.GET("/logout", h.Logout)
-}
+func (h UserHandler) RegisterHandler(middlewares ...gin.HandlerFunc) {
+	h.router.POST("accounts/login", h.Login)
 
-func (h UserHandler) RegisterMiddleware(middleware func(c *gin.Context)) {
-	h.router.Use(middleware)
+	//- As a admin, I can create/update/view list/view detail/delete contracts and staffs.
+	//* POST /api/staffs/ (create)
+	//* GET /api/staffs/ (get list)
+	//* PATCH/PUT /api/staffs/<id>/ (update)
+	//* GET /api/staffs/<id>/ (get detail)
+	//* DELETE /api/staffs/<id>/ (delete)
+	admin := h.router.Group("api/staffs")
+	admin.Use(middlewares...)
+	admin.POST("/", h.CreateUser)
+	admin.GET("/", h.GetListUsers)
+	admin.PUT("/:uuid", h.UpdateUser)
+	admin.GET("/:uuid", h.GetUserDetail)
+	admin.DELETE("/:uuid", h.DeleteUser)
 }

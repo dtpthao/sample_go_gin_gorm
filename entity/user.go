@@ -15,13 +15,19 @@ type User struct {
 }
 
 type IUserRepo interface {
-	Create(u User) error
-	FindByUsername(username string) (*User, error)
-	DeleteByUsername(username string) error
+	Create(u User) (*User, error)
+	GetDetails(username string) (*User, error)
+	Delete(username string) error
+	GetList() ([]User, error)
+	Update(u User) (*User, error)
 }
 
 type IUserUseCase interface {
-	Register(u User) error
+	Create(u User) (*User, error)
 	Login(u User) (string, error)
 	Logout(username string) error
+	GetDetails(username string) (*User, error)
+	GetList() ([]User, error)
+	Update(u User) (*User, error)
+	Delete(username string) error
 }

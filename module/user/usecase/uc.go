@@ -11,19 +11,39 @@ type UserUseCase struct {
 	tokenUC entity.ITokenUseCase
 }
 
-func (uc UserUseCase) Register(u entity.User) error {
-	_, err := uc.repo.FindByUsername(u.Username)
+func (uc UserUseCase) GetList() ([]entity.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (uc UserUseCase) Update(u entity.User) (*entity.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (uc UserUseCase) Delete(username string) error {
+	return uc.repo.Delete(username)
+}
+
+func NewUserUseCase(r entity.IUserRepo, tuc entity.ITokenUseCase) entity.IUserUseCase {
+	return UserUseCase{
+		repo:    r,
+		tokenUC: tuc,
+	}
+}
+
+func (uc UserUseCase) Create(u entity.User) (*entity.User, error) {
+	_, err := uc.repo.GetDetails(u.Username)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		// todo hash password
-		err = uc.repo.Create(u)
-		return err
+		return uc.repo.Create(u)
 	}
-	return err
+	return nil, err
 }
 
 func (uc UserUseCase) Login(u entity.User) (string, error) {
 
-	dbUser, err := uc.repo.FindByUsername(u.Username)
+	dbUser, err := uc.repo.GetDetails(u.Username)
 	if err != nil {
 		return "", err
 	}
@@ -40,14 +60,11 @@ func (uc UserUseCase) Login(u entity.User) (string, error) {
 	return token, nil
 }
 
+func (uc UserUseCase) GetDetails(username string) (*entity.User, error) {
+	return uc.repo.GetDetails(username)
+}
+
 func (uc UserUseCase) Logout(username string) error {
 	// TODO implement me
 	panic("implement me")
-}
-
-func NewUserUseCase(r entity.IUserRepo, tuc entity.ITokenUseCase) entity.IUserUseCase {
-	return UserUseCase{
-		repo:    r,
-		tokenUC: tuc,
-	}
 }
