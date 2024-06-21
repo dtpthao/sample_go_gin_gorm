@@ -29,8 +29,8 @@ func (uc ContractUseCase) GetListByUser(userUuid string) ([]entity.Contract, err
 	return uc.repo.GetListByUser(userUuid)
 }
 
-func (uc ContractUseCase) Update(c entity.UpdateContractRequest) error {
-	return uc.repo.Update(c.Uuid, c.ToMap())
+func (uc ContractUseCase) Update(cUuid string, c entity.UpdateContractRequest) error {
+	return uc.repo.Update(cUuid, c.ToMap())
 }
 
 func (uc ContractUseCase) GetDetails(cUuid string) (*entity.Contract, error) {

@@ -17,13 +17,12 @@ type NewContractRequest struct {
 }
 
 type UpdateContractRequest struct {
-	Uuid        string `json:"uuid" binding:"required"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
-func (u UpdateContractRequest) ToMap() map[string]string {
-	return map[string]string{
+func (u UpdateContractRequest) ToMap() map[string]any {
+	return map[string]any{
 		"name":        u.Name,
 		"description": u.Description,
 	}
@@ -47,7 +46,7 @@ type DeleteContractResponse struct {
 type IContractUseCase interface {
 	CreateNew(uUuid string, c NewContractRequest) (*Contract, error)
 	GetListByUser(userUuid string) ([]Contract, error)
-	Update(c UpdateContractRequest) error
+	Update(cUuid string, c UpdateContractRequest) error
 	GetDetails(cUuid string) (*Contract, error)
 	DeleteByUser(cUuid string, uUuid string) error
 	Delete(cUuid string) error

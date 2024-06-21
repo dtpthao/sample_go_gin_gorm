@@ -51,6 +51,8 @@ func (h ContractHandler) GetList(context *gin.Context) {
 
 func (h ContractHandler) UpdateContract(context *gin.Context) {
 
+	cUuid := context.Param("uuid")
+
 	userUuid, isAdmin, err := utils.GetMiddlewareValues(context)
 	if err != nil {
 		utils.HandleError(context, http.StatusInternalServerError, err)
@@ -65,7 +67,7 @@ func (h ContractHandler) UpdateContract(context *gin.Context) {
 	}
 
 	if !isAdmin {
-		contract, err := h.uc.GetDetails(updateReg.Uuid)
+		contract, err := h.uc.GetDetails(cUuid)
 		if err != nil {
 			utils.HandleError(context, http.StatusInternalServerError, err) // fixme status is either BadReq or Internal
 			return
@@ -77,7 +79,7 @@ func (h ContractHandler) UpdateContract(context *gin.Context) {
 		}
 	}
 
-	err = h.uc.Update(updateReg)
+	err = h.uc.Update(cUuid, updateReg)
 	if err != nil {
 		utils.HandleError(context, http.StatusInternalServerError, err)
 		return

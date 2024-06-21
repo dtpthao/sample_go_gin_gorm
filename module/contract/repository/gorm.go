@@ -127,10 +127,15 @@ func (r ContractRepository) DeleteByUser(cUuid string, uUuid string) error {
 		return tx.Error
 	}
 
-	err := r.db.Table(TableContract).Where("uuid = ? and user_uuid = ?", cUuid, uUuid).Delete(&c).Error
-	if err != nil {
+	res := r.db.Table(TableContract).Where("uuid = ? and user_uuid = ?", cUuid, uUuid).Delete(&c)
+	if res.Error != nil {
 		tx.Rollback()
-		return err
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		tx.Rollback()
+		return errors.New("delete contract failed")
 	}
 
 	if tx.Commit().Error != nil {
