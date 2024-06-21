@@ -33,7 +33,7 @@ func (h TokenHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
-	user, err := h.uuc.GetDetails(token.Username)
+	user, err := h.uuc.GetUserByUsername(token.Username)
 	if err != nil {
 		utils.HandleError(c, http.StatusBadRequest, err)
 		return

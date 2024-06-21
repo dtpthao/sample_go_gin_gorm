@@ -91,7 +91,7 @@ type UpdateUserRequest struct {
 
 func (h UserHandler) UpdateUser(c *gin.Context) {
 
-	uuid := c.Param("uuid")
+	uUuid := c.Param("uuid")
 
 	var uReg UpdateUserRequest
 	err := c.ShouldBindJSON(&uReg)
@@ -102,22 +102,32 @@ func (h UserHandler) UpdateUser(c *gin.Context) {
 
 	// todo validate input
 	user := entity.User{
-		Uuid:     uuid,
+		Uuid:     uUuid,
 		Username: uReg.Username,
 		Password: uReg.Password,
 		IsAdmin:  uReg.IsAdmin,
 	}
 
-	updatedUser, err := h.uc.Update(user)
+	err = h.uc.Update(user)
 	if err != nil {
 		utils.HandleError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedUser)
+	c.JSON(http.StatusOK, nil)
 }
 
-func (h UserHandler) GetUserDetail(c *gin.Context) {}
+func (h UserHandler) GetUserInfo(c *gin.Context) {
+
+	uUuid := c.Param("uuid")
+	user, err := h.uc.GetUserByUuid(uUuid)
+	if err != nil {
+		utils.HandleError(c, http.StatusBadRequest, err) // todo error can be either BadRequest or Internal
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
 
 func (h UserHandler) DeleteUser(c *gin.Context) {}
 

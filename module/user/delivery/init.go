@@ -31,6 +31,6 @@ func (h UserHandler) RegisterHandler(middlewares ...gin.HandlerFunc) {
 	admin.POST("/", h.CreateUser)
 	admin.GET("/", h.GetListUsers)
 	admin.PUT("/:uuid", h.UpdateUser)
-	admin.GET("/:uuid", h.GetUserDetail)
+	admin.GET("/:uuid", h.GetUserInfo)
 	admin.DELETE("/:uuid", h.DeleteUser)
 }

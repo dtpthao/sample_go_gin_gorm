@@ -50,9 +50,18 @@ func (r UserRepository) Create(u entity.User) (*entity.User, error) {
 	return ur.ToEntity(), err
 }
 
-func (r UserRepository) GetDetails(username string) (*entity.User, error) {
+func (r UserRepository) GetUserByUsername(username string) (*entity.User, error) {
 	var res UserRepository
 	err := r.db.Table(TableUsers).Where("username = ?", username).Take(&res).Error
+	if err != nil {
+		return nil, err
+	}
+	return res.ToEntity(), nil
+}
+
+func (r UserRepository) GetUserByUuid(uuid string) (*entity.User, error) {
+	var res UserRepository
+	err := r.db.Table(TableUsers).Where("uuid = ?", uuid).Take(&res).Error
 	if err != nil {
 		return nil, err
 	}
@@ -78,28 +87,28 @@ func (r UserRepository) GetList() ([]entity.User, error) {
 	return users, err
 }
 
-func (r UserRepository) Update(u entity.User) (*entity.User, error) {
+func (r UserRepository) Update(uuid string, data map[string]any) error {
 
 	tx := r.db.Begin()
 	if tx.Error != nil {
-		return nil, tx.Error
+		return tx.Error
 	}
 
-	res := tx.Table(TableUsers).Where("uuid = ?", u.Uuid).Updates(&u)
+	res := tx.Table(TableUsers).Where("uuid = ?", uuid).Updates(data)
 	if res.Error != nil {
 		tx.Rollback()
-		return nil, res.Error
+		return res.Error
 	}
 
 	if res.RowsAffected == 0 {
 		tx.Rollback()
-		return nil, errors.New("failed to update user")
+		return errors.New("failed to update user")
 	}
 
 	if tx.Commit().Error != nil {
 		tx.Rollback()
-		return nil, errors.New("cannot commit transaction")
+		return errors.New("cannot commit transaction")
 	}
 
-	return &u, nil
+	return nil
 }
