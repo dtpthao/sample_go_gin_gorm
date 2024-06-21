@@ -24,12 +24,7 @@ func (h ContractHandler) CreateNew(context *gin.Context) {
 		return
 	}
 
-	if userUuid != cReq.UserUuid {
-		utils.HandleError(context, http.StatusBadRequest, errors.New("you cannot create contract for other staff"))
-		return
-	}
-
-	newContract, err := h.uc.CreateNew(cReq)
+	newContract, err := h.uc.CreateNew(userUuid, cReq)
 	if err != nil {
 		utils.HandleError(context, http.StatusInternalServerError, err)
 		return
@@ -47,7 +42,7 @@ func (h ContractHandler) GetList(context *gin.Context) {
 
 	list, err := h.uc.GetListByUser(userUuid.(string))
 	if err != nil {
-		utils.HandleError(context, http.StatusInternalServerError, errors.New("cannot get user uuid"))
+		utils.HandleError(context, http.StatusInternalServerError, err)
 		return
 	}
 

@@ -13,13 +13,13 @@ func NewContractUseCase(r entity.IContractRepository) entity.IContractUseCase {
 	return &ContractUseCase{repo: r}
 }
 
-func (uc ContractUseCase) CreateNew(c entity.NewContractRequest) (*entity.Contract, error) {
+func (uc ContractUseCase) CreateNew(uUuid string, c entity.NewContractRequest) (*entity.Contract, error) {
 
 	contract := entity.Contract{
-		Uuid:     uuid.New().String(),
-		Name:     c.Name,
-		UserUuid: c.UserUuid,
-		Details:  c.Details,
+		Uuid:        uuid.New().String(),
+		Name:        c.Name,
+		UserUuid:    uUuid,
+		Description: c.Description,
 	}
 
 	return uc.repo.Add(contract)

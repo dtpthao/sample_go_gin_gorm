@@ -3,30 +3,29 @@ package entity
 import "time"
 
 type Contract struct {
-	Uuid      string    `json:"uuid,omitempty" binding:"required"`
-	Name      string    `json:"name"`
-	UserUuid  string    `json:"user_uuid" binding:"required"`
-	Details   any       `json:"details"`
-	CreatedAt time.Time `json:"created_at,omitempty" time_format:"2006-01-02 15:04:05"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"  time_format:"2006-01-02 15:04:05"`
+	Uuid        string    `json:"uuid,omitempty" binding:"required"`
+	Name        string    `json:"name"`
+	UserUuid    string    `json:"user_uuid" binding:"required"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at,omitempty" time_format:"2006-01-02 15:04:05"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"  time_format:"2006-01-02 15:04:05"`
 }
 
 type NewContractRequest struct {
-	Name     string `json:"name" binding:"required"`
-	UserUuid string `json:"user_uuid" binding:"required"`
-	Details  any    `json:"details"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description"`
 }
 
 type UpdateContractRequest struct {
-	Uuid    string `json:"uuid" binding:"required"`
-	Name    string `json:"name"`
-	Details any    `json:"details"`
+	Uuid        string `json:"uuid" binding:"required"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
-func (u UpdateContractRequest) ToMap() map[string]any {
-	return map[string]any{
-		"name":    u.Name,
-		"details": u.Details,
+func (u UpdateContractRequest) ToMap() map[string]string {
+	return map[string]string{
+		"name":        u.Name,
+		"description": u.Description,
 	}
 }
 
@@ -46,7 +45,7 @@ type DeleteContractResponse struct {
 //* DELETE /api/contracts/<id>/ (delete)
 
 type IContractUseCase interface {
-	CreateNew(c NewContractRequest) (*Contract, error)
+	CreateNew(uUuid string, c NewContractRequest) (*Contract, error)
 	GetListByUser(userUuid string) ([]Contract, error)
 	Update(c UpdateContractRequest) error
 	GetDetails(cUuid string) (*Contract, error)

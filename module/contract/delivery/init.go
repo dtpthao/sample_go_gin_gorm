@@ -18,6 +18,8 @@ func NewContractHandler(app *gin.Engine, uc entity.IContractUseCase) ContractHan
 }
 
 func (h ContractHandler) RegisterHandler(middlewares ...gin.HandlerFunc) {
+
+	h.router.Use(middlewares...)
 	//- As a staff, I can create/update/view list/view detail/delete contracts.
 	//* POST /api/contracts/ (create)
 	//* GET /api/contracts/ (get list)

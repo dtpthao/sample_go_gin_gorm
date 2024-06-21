@@ -6,6 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
 	"glintecoTask/entity"
+	delivery2 "glintecoTask/module/contract/delivery"
+	repository2 "glintecoTask/module/contract/repository"
+	usecase2 "glintecoTask/module/contract/usecase"
 	tokenDelivery "glintecoTask/module/token/delivery"
 	tokenUC "glintecoTask/module/token/usecase"
 	"glintecoTask/module/user/delivery"
@@ -75,6 +78,7 @@ func main() {
 	app := gin.New()
 	app.Use(apiLog.AccessLog)
 
+	// user
 	userRepository := repository.NewUserRepository(db)
 	userUseCase := usecase.NewUserUseCase(userRepository, tokenUseCase)
 
@@ -82,6 +86,12 @@ func main() {
 
 	userHandler := delivery.NewUserHandler(app, userUseCase)
 	userHandler.RegisterHandler(tokenHandler.Authenticate, tokenHandler.AdminAuthorize)
+
+	// contract
+	cRepository := repository2.NewContractRepository(db)
+	cUseCase := usecase2.NewContractUseCase(cRepository)
+	cHandler := delivery2.NewContractHandler(app, cUseCase)
+	cHandler.RegisterHandler(tokenHandler.Authenticate)
 
 	addr := fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port)
 	apiLog.Info().Msg("Server start at: http://" + addr)

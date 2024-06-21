@@ -11,11 +11,11 @@ CREATE TABLE users
 
 CREATE TABLE contracts
 (
-    uuid      varchar(36) UNIQUE PRIMARY KEY NOT NULL,
-    user_uuid varchar(36),
-    name      varchar(255),
-    info      blob,
-    created_at datetime(3),
-    updated_at datetime(3),
+    uuid        varchar(36) UNIQUE PRIMARY KEY NOT NULL,
+    user_uuid   varchar(36),
+    name        varchar(255),
+    description text,
+    created_at  datetime(3),
+    updated_at  datetime(3),
     FOREIGN KEY (user_uuid) REFERENCES users (uuid)
 )

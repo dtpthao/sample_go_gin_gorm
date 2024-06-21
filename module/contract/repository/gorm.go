@@ -7,16 +7,16 @@ import (
 	"time"
 )
 
-const TableContract = "contract"
+const TableContract = "contracts"
 
 type ContractRepository struct {
-	Uuid      string    `gorm:"primaryKey;column:uuid"`
-	Name      string    `gorm:"column:name"`
-	UserUuid  string    `gorm:"column:user_uuid"`
-	Details   any       `gorm:"column:details"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoCreateTime;column:updated_at"`
-	db        *gorm.DB
+	Uuid        string    `gorm:"primaryKey;column:uuid"`
+	Name        string    `gorm:"column:name"`
+	UserUuid    string    `gorm:"column:user_uuid"`
+	Description string    `gorm:"column:description"`
+	CreatedAt   time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt   time.Time `gorm:"autoCreateTime;column:updated_at"`
+	db          *gorm.DB
 }
 
 func NewContractRepository(db *gorm.DB) entity.IContractRepository {
@@ -25,23 +25,23 @@ func NewContractRepository(db *gorm.DB) entity.IContractRepository {
 
 func (r ContractRepository) FromEntity(c entity.Contract) ContractRepository {
 	return ContractRepository{
-		Uuid:      c.Uuid,
-		Name:      c.Name,
-		UserUuid:  c.UserUuid,
-		Details:   c.Details,
-		CreatedAt: c.CreatedAt,
-		UpdatedAt: c.UpdatedAt,
+		Uuid:        c.Uuid,
+		Name:        c.Name,
+		UserUuid:    c.UserUuid,
+		Description: c.Description,
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
 	}
 }
 
 func (r ContractRepository) ToEntity() *entity.Contract {
 	return &entity.Contract{
-		Uuid:      r.Uuid,
-		Name:      r.Name,
-		UserUuid:  r.UserUuid,
-		Details:   r.Details,
-		CreatedAt: r.CreatedAt,
-		UpdatedAt: r.UpdatedAt,
+		Uuid:        r.Uuid,
+		Name:        r.Name,
+		UserUuid:    r.UserUuid,
+		Description: r.Description,
+		CreatedAt:   r.CreatedAt,
+		UpdatedAt:   r.UpdatedAt,
 	}
 }
 
