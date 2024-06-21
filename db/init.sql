@@ -15,5 +15,7 @@ CREATE TABLE contracts
     user_uuid varchar(36),
     name      varchar(255),
     info      blob,
+    created_at datetime(3),
+    updated_at datetime(3),
     FOREIGN KEY (user_uuid) REFERENCES users (uuid)
 )

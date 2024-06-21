@@ -19,7 +19,7 @@ func (ContractUseCase) Update(c entity.UpdateContractRequest) error {
 	panic("implement me")
 }
 
-func (ContractUseCase) GetInfo(cUuid string) (*entity.Contract, error) {
+func (ContractUseCase) GetDetails(cUuid string) (*entity.Contract, error) {
 	//TODO implement me
 	panic("implement me")
 }

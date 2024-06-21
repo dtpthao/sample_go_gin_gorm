@@ -1,10 +1,14 @@
 package entity
 
+import "time"
+
 type Contract struct {
-	Uuid     string `json:"uuid,omitempty" binding:"required"`
-	Name     string `json:"name"`
-	UserUuid string `json:"user_uuid" binding:"required"`
-	Details  any    `json:"details"`
+	Uuid      string    `json:"uuid,omitempty" binding:"required"`
+	Name      string    `json:"name"`
+	UserUuid  string    `json:"user_uuid" binding:"required"`
+	Details   any       `json:"details"`
+	CreatedAt time.Time `json:"created_at,omitempty" time_format:"2006-01-02 15:04:05"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"  time_format:"2006-01-02 15:04:05"`
 }
 
 type NewContractRequest struct {
@@ -29,14 +33,15 @@ type IContractUseCase interface {
 	CreateNew(c NewContractRequest) (*Contract, error)
 	GetList() ([]Contract, error)
 	Update(c UpdateContractRequest) error
-	GetInfo(cUuid string) (*Contract, error)
+	GetDetails(cUuid string) (*Contract, error)
 	Delete(cUuid string) error
 }
 
 type IContractRepository interface {
 	Add(c Contract) (*Contract, error)
+	GetListByUser(userUuid string) ([]Contract, error)
 	GetList() ([]Contract, error)
 	Update(c Contract) error
-	GetInfo(cUuid string) (*Contract, error)
+	GetDetails(cUuid string) (*Contract, error)
 	Delete(cUuid string) error
 }
