@@ -3,22 +3,18 @@ package usecase
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"glintecoTask/entity"
-	"net/http"
 	"time"
 )
 
 type TokenUseCase struct {
-	jwtSecret string
-	userRepo  entity.IUserRepo
+	jwtSecret []byte
 }
 
-func NewTokenUseCase(jwtSecret string, userRepo entity.IUserRepo) entity.ITokenUseCase {
+func NewTokenUseCase(jwtSecret []byte) entity.ITokenUseCase {
 	return &TokenUseCase{
 		jwtSecret: jwtSecret,
-		userRepo:  userRepo,
 	}
 }
 
@@ -60,28 +56,4 @@ func (uc TokenUseCase) Verify(tokenString string) (*entity.Token, error) {
 	}
 
 	return &entity.Token{Username: username}, nil
-}
-
-func (uc TokenUseCase) Middleware(c *gin.Context) {
-	tokenString, err := c.Cookie("token")
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	token, err := uc.Verify(tokenString)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	user, err := uc.userRepo.FindByUsername(token.Username)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-
-	c.Set("username", user.Username)
-	c.Set("admin", user.IsAdmin)
-	c.Next()
 }
