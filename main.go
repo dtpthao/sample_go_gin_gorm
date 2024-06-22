@@ -6,14 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
 	"glintecoTask/entity"
-	delivery2 "glintecoTask/module/contract/delivery"
-	repository2 "glintecoTask/module/contract/repository"
-	usecase2 "glintecoTask/module/contract/usecase"
-	tokenDelivery "glintecoTask/module/token/delivery"
-	tokenUC "glintecoTask/module/token/usecase"
-	"glintecoTask/module/user/delivery"
-	"glintecoTask/module/user/repository"
-	"glintecoTask/module/user/usecase"
+	cH "glintecoTask/module/contract/handler"
+	cRepo "glintecoTask/module/contract/repository"
+	cUC "glintecoTask/module/contract/usecase"
+	tH "glintecoTask/module/token/handler"
+	tUC "glintecoTask/module/token/usecase"
+	uH "glintecoTask/module/user/handler"
+	uRepo "glintecoTask/module/user/repository"
+	uUC "glintecoTask/module/user/usecase"
 	apiLog "glintecoTask/utils/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -73,24 +73,24 @@ func main() {
 	sqlDB.SetMaxOpenConns(100)
 
 	jwtSecret, _ := hex.DecodeString(serverConfig.JWTSecret)
-	tokenUseCase := tokenUC.NewTokenUseCase(jwtSecret)
+	tokenUseCase := tUC.NewTokenUseCase(jwtSecret)
 
 	app := gin.New()
 	app.Use(apiLog.AccessLog)
 
 	// user
-	userRepository := repository.NewUserRepository(db)
-	userUseCase := usecase.NewUserUseCase(userRepository, tokenUseCase)
+	userRepository := uRepo.NewUserRepository(db)
+	userUseCase := uUC.NewUserUseCase(userRepository, tokenUseCase)
 
-	tokenHandler := tokenDelivery.NewTokenHandler(tokenUseCase, userUseCase, jwtSecret)
+	tokenHandler := tH.NewTokenHandler(tokenUseCase, userUseCase, jwtSecret)
 
-	userHandler := delivery.NewUserHandler(app, userUseCase)
+	userHandler := uH.NewUserHandler(app, userUseCase)
 	userHandler.RegisterHandler(tokenHandler.Authenticate, tokenHandler.AdminAuthorize)
 
 	// contract
-	cRepository := repository2.NewContractRepository(db)
-	cUseCase := usecase2.NewContractUseCase(cRepository)
-	cHandler := delivery2.NewContractHandler(app, cUseCase)
+	cRepository := cRepo.NewContractRepository(db)
+	cUseCase := cUC.NewContractUseCase(cRepository)
+	cHandler := cH.NewContractHandler(app, cUseCase)
 	cHandler.RegisterHandler(tokenHandler.Authenticate)
 
 	addr := fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port)
