@@ -49,13 +49,13 @@ func TestContractHandler_CreateNew(t *testing.T) {
 	tests := []struct {
 		name   string
 		user   entity.User
-		new    entity.NewContractRequest
+		new    *entity.NewContractRequest
 		status int
 	}{
 		{
 			"Admin Success",
 			mockData.Admin,
-			entity.NewContractRequest{
+			&entity.NewContractRequest{
 				Name:        "New Contract",
 				Description: "New contract description",
 			},
@@ -64,16 +64,22 @@ func TestContractHandler_CreateNew(t *testing.T) {
 		{
 			"Staff success",
 			mockData.Staff,
-			entity.NewContractRequest{
+			&entity.NewContractRequest{
 				Name:        "New Contract",
 				Description: "New contract description",
 			},
 			http.StatusOK,
 		},
 		{
+			"Invalid request body",
+			mockData.Staff,
+			nil,
+			http.StatusBadRequest,
+		},
+		{
 			"Malicious user",
 			mockData.InvalidUser,
-			entity.NewContractRequest{
+			&entity.NewContractRequest{
 				Name:        "New Contract",
 				Description: "New contract description",
 			},
@@ -85,7 +91,10 @@ func TestContractHandler_CreateNew(t *testing.T) {
 			token, _ := tokenUC.Create(tt.user)
 			token = "Bearer " + token
 
-			jsonValue, _ := json.Marshal(tt.new)
+			var jsonValue []byte
+			if tt.new != nil {
+				jsonValue, _ = json.Marshal(tt.new)
+			}
 			req, _ := http.NewRequest("POST", APIPath, bytes.NewBuffer(jsonValue))
 			req.Header.Set("Authorization", token)
 			w := httptest.NewRecorder()
@@ -125,6 +134,12 @@ func TestContractHandler_Delete(t *testing.T) {
 			mockData.Admin,
 			mockData.StaffContractsUuid()[0],
 			http.StatusNoContent,
+		},
+		{
+			"Admin delete non-exist contract",
+			mockData.Admin,
+			"invalid-contract-uuid",
+			http.StatusInternalServerError,
 		},
 		{
 			"Staff delete their contract",
@@ -294,14 +309,14 @@ func TestContractHandler_UpdateContract(t *testing.T) {
 		name   string
 		user   entity.User
 		cUuid  string
-		req    entity.UpdateContractRequest
+		req    *entity.UpdateContractRequest
 		status int
 	}{
 		{
 			"Admin update admin's contract",
 			mockData.Admin,
 			mockData.AdminContractsUuid()[0],
-			entity.UpdateContractRequest{
+			&entity.UpdateContractRequest{
 				Name:        "update contract",
 				Description: "update description",
 			},
@@ -311,17 +326,27 @@ func TestContractHandler_UpdateContract(t *testing.T) {
 			"Admin update staff's contract",
 			mockData.Admin,
 			mockData.StaffContractsUuid()[0],
-			entity.UpdateContractRequest{
+			&entity.UpdateContractRequest{
 				Name:        "update contract",
 				Description: "update description",
 			},
 			http.StatusOK,
 		},
 		{
+			"Admin update non-exist contract",
+			mockData.Admin,
+			"invalid-contract-uuid",
+			&entity.UpdateContractRequest{
+				Name:        "update contract",
+				Description: "update description",
+			},
+			http.StatusInternalServerError,
+		},
+		{
 			"Staff update their's contract",
 			mockData.Staff,
 			mockData.StaffContractsUuid()[0],
-			entity.UpdateContractRequest{
+			&entity.UpdateContractRequest{
 				Name:        "update contract",
 				Description: "update description",
 			},
@@ -331,17 +356,34 @@ func TestContractHandler_UpdateContract(t *testing.T) {
 			"Staff update admin's contract",
 			mockData.Staff,
 			mockData.AdminContractsUuid()[0],
-			entity.UpdateContractRequest{
+			&entity.UpdateContractRequest{
 				Name:        "update contract",
 				Description: "update description",
 			},
 			http.StatusBadRequest,
 		},
 		{
+			"Staff update non-exist contract",
+			mockData.Staff,
+			"invalid-uuid",
+			&entity.UpdateContractRequest{
+				Name:        "update contract",
+				Description: "update description",
+			},
+			http.StatusInternalServerError,
+		},
+		{
+			"Invalid request body",
+			mockData.Staff,
+			mockData.StaffContractsUuid()[0],
+			nil,
+			http.StatusBadRequest,
+		},
+		{
 			"Malicious user",
 			mockData.InvalidUser,
 			mockData.StaffContractsUuid()[0],
-			entity.UpdateContractRequest{
+			&entity.UpdateContractRequest{
 				Name:        "update contract",
 				Description: "update description",
 			},
@@ -353,7 +395,10 @@ func TestContractHandler_UpdateContract(t *testing.T) {
 			token, _ := tokenUC.Create(tt.user)
 			token = "Bearer " + token
 
-			jsonValue, _ := json.Marshal(tt.req)
+			var jsonValue []byte
+			if tt.req != nil {
+				jsonValue, _ = json.Marshal(tt.req)
+			}
 			req, _ := http.NewRequest("PUT", APIPath+tt.cUuid, bytes.NewBuffer(jsonValue))
 			req.Header.Set("Authorization", token)
 			w := httptest.NewRecorder()

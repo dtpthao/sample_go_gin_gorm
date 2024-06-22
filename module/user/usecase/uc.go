@@ -11,6 +11,13 @@ type UserUseCase struct {
 	tokenUC entity.ITokenUseCase
 }
 
+func NewUserUseCase(r entity.IUserRepo, tuc entity.ITokenUseCase) entity.IUserUseCase {
+	return UserUseCase{
+		repo:    r,
+		tokenUC: tuc,
+	}
+}
+
 func (uc UserUseCase) GetList() ([]entity.User, error) {
 	return uc.repo.GetList()
 }
@@ -26,13 +33,6 @@ func (uc UserUseCase) Update(u entity.User) error {
 
 func (uc UserUseCase) Delete(userUuid string) error {
 	return uc.repo.Delete(userUuid)
-}
-
-func NewUserUseCase(r entity.IUserRepo, tuc entity.ITokenUseCase) entity.IUserUseCase {
-	return UserUseCase{
-		repo:    r,
-		tokenUC: tuc,
-	}
 }
 
 func (uc UserUseCase) Create(u entity.User) (*entity.User, error) {
