@@ -3,6 +3,7 @@ package test
 import (
 	"errors"
 	"glintecoTask/entity"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
@@ -25,7 +26,7 @@ func (ur UserRepository) GetUserByUsername(username string) (*entity.User, error
 	case ur.Data.Staff.Username:
 		return &ur.Data.Staff, nil
 	default:
-		return nil, errors.New("record not found")
+		return nil, gorm.ErrRecordNotFound
 	}
 }
 
@@ -36,7 +37,7 @@ func (ur UserRepository) GetUserByUuid(uuid string) (*entity.User, error) {
 	case ur.Data.Staff.Uuid:
 		return &ur.Data.Staff, nil
 	default:
-		return nil, errors.New("record not found")
+		return nil, gorm.ErrRecordNotFound
 	}
 }
 

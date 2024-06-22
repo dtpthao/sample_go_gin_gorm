@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+const JWTSecret = "5b0b18dc37004b97946367ca5d82673918a6c6e7a817bf84236abe1c0907b9bf"
 const AdminUsername = "admin"
 const StaffUsername = "staff"
 const AdminUuid = "386069f6-72e1-4300-b7a4-a212e728ba5a"
@@ -15,6 +16,7 @@ const TestInvalidDeleteUuid = "invalid-uuid"
 type MockData struct {
 	Admin          entity.User
 	Staff          entity.User
+	InvalidUser    entity.User
 	AdminContracts []entity.Contract
 	StaffContracts []entity.Contract
 }
@@ -57,6 +59,16 @@ func NewMockData() MockData {
 		IsAdmin:   false,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
+		DeletedAt: false,
+	}
+
+	m.InvalidUser = entity.User{
+		Uuid:      "invaliduseruuid",
+		Username:  "invalidusername",
+		Password:  "pass",
+		IsAdmin:   false,
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 		DeletedAt: false,
 	}
 
