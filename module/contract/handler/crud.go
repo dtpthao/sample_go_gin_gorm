@@ -138,5 +138,5 @@ func (h ContractHandler) Delete(context *gin.Context) {
 		}
 	}
 
-	context.JSON(http.StatusOK, entity.DeleteContractResponse{Success: true})
+	context.JSON(http.StatusNoContent, entity.DeleteContractResponse{Success: true})
 }

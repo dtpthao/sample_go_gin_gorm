@@ -92,6 +92,12 @@ func TestUserHandler_CreateUser(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var newUser entity.User
+				json.Unmarshal(w.Body.Bytes(), &newUser)
+				assert.NotEmpty(t, newUser)
+			}
 		})
 	}
 }
@@ -138,6 +144,12 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusNoContent {
+				var res entity.DeleteUserResponse
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }
@@ -180,6 +192,12 @@ func TestUserHandler_GetListUsers(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var res []entity.User
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }
@@ -232,6 +250,12 @@ func TestUserHandler_GetUserInfo(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var res entity.User
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }
@@ -299,6 +323,12 @@ func TestUserHandler_Login(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var res entity.LoginResponse
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }

@@ -92,6 +92,12 @@ func TestContractHandler_CreateNew(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var res entity.Contract
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }
@@ -112,19 +118,19 @@ func TestContractHandler_Delete(t *testing.T) {
 			"Admin delete admin contract",
 			mockData.Admin,
 			mockData.AdminContractsUuid()[0],
-			http.StatusOK,
+			http.StatusNoContent,
 		},
 		{
 			"Admin delete staff contract",
 			mockData.Admin,
 			mockData.StaffContractsUuid()[0],
-			http.StatusOK,
+			http.StatusNoContent,
 		},
 		{
 			"Staff delete their contract",
 			mockData.Staff,
 			mockData.StaffContractsUuid()[1],
-			http.StatusOK,
+			http.StatusNoContent,
 		},
 		{
 			"Staff delete someone else's contract",
@@ -220,6 +226,12 @@ func TestContractHandler_GetDetails(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var res entity.Contract
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }
@@ -262,6 +274,12 @@ func TestContractHandler_GetList(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
+
+			if tt.status == http.StatusOK {
+				var res []entity.Contract
+				json.Unmarshal(w.Body.Bytes(), &res)
+				assert.NotEmpty(t, res)
+			}
 		})
 	}
 }
