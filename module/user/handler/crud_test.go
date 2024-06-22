@@ -46,13 +46,13 @@ func TestUserHandler_CreateUser(t *testing.T) {
 	tests := []struct {
 		name   string
 		user   entity.User
-		new    entity.NewUserRequest
+		new    *entity.NewUserRequest
 		status int
 	}{
 		{
 			"Admin Success",
 			mockData.Admin,
-			entity.NewUserRequest{
+			&entity.NewUserRequest{
 				Username: "newstaff",
 				Password: "12345",
 				IsAdmin:  false,
@@ -60,9 +60,25 @@ func TestUserHandler_CreateUser(t *testing.T) {
 			http.StatusOK,
 		},
 		{
+			"Admin add user already exists",
+			mockData.Admin,
+			&entity.NewUserRequest{
+				Username: mockData.Staff.Username,
+				Password: "12345",
+				IsAdmin:  false,
+			},
+			http.StatusBadRequest,
+		},
+		{
+			"Admin send incorrect data format",
+			mockData.Admin,
+			nil,
+			http.StatusBadRequest,
+		},
+		{
 			"Staff unauthorized",
 			mockData.Staff,
-			entity.NewUserRequest{
+			&entity.NewUserRequest{
 				Username: "newstaff",
 				Password: "12345",
 				IsAdmin:  false,
@@ -72,7 +88,7 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		{
 			"Malicious user",
 			mockData.InvalidUser,
-			entity.NewUserRequest{
+			&entity.NewUserRequest{
 				Username: "newstaff",
 				Password: "12345",
 				IsAdmin:  false,
@@ -85,7 +101,10 @@ func TestUserHandler_CreateUser(t *testing.T) {
 			token, _ := tokenUC.Create(tt.user)
 			token = "Bearer " + token
 
-			jsonValue, _ := json.Marshal(tt.new)
+			var jsonValue []byte
+			if tt.new != nil {
+				jsonValue, _ = json.Marshal(tt.new)
+			}
 			req, _ := http.NewRequest("POST", APIPath, bytes.NewBuffer(jsonValue))
 			req.Header.Set("Authorization", token)
 			w := httptest.NewRecorder()
@@ -100,6 +119,23 @@ func TestUserHandler_CreateUser(t *testing.T) {
 			}
 		})
 	}
+
+	testExpiredToken := tests[0]
+	t.Run("Expired token", func(t *testing.T) {
+		//token, _ := tokenUC.Create(testExpiredToken.user)
+		token := "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTkwOTIyOTUsImlhdCI6MTcxOTA4ODY5NSwidXNlcm5hbWUiOiJhZG1pbiJ9.mTHMQS_OQC1pbKTMecN0FrIFMxgRnWZzfRBMOoMNVDs"
+
+		var jsonValue []byte
+		if testExpiredToken.new != nil {
+			jsonValue, _ = json.Marshal(testExpiredToken.new)
+		}
+		req, _ := http.NewRequest("POST", APIPath, bytes.NewBuffer(jsonValue))
+		req.Header.Set("Authorization", token)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
 }
 
 func TestUserHandler_DeleteUser(t *testing.T) {
@@ -144,12 +180,6 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tt.status, w.Code)
-
-			//if tt.status == http.StatusNoContent {
-			//	var res entity.DeleteUserResponse
-			//	json.Unmarshal(w.Body.Bytes(), &res)
-			//	assert.NotEmpty(t, res)
-			//}
 		})
 	}
 }
@@ -262,7 +292,7 @@ func TestUserHandler_GetUserInfo(t *testing.T) {
 
 func TestUserHandler_Login(t *testing.T) {
 	mockData := test.NewMockData()
-	_, tokenUC, handler := Setup(mockData)
+	_, _, handler := Setup(mockData)
 
 	loginpath := "/accounts/login"
 	router := SetupRouter()
@@ -271,13 +301,13 @@ func TestUserHandler_Login(t *testing.T) {
 	tests := []struct {
 		name   string
 		user   entity.User
-		req    entity.UserLogin
+		req    *entity.UserLogin
 		status int
 	}{
 		{
 			"Admin Success",
 			mockData.Admin,
-			entity.UserLogin{
+			&entity.UserLogin{
 				Username: mockData.Admin.Username,
 				Password: mockData.Admin.Password,
 			},
@@ -286,7 +316,7 @@ func TestUserHandler_Login(t *testing.T) {
 		{
 			"Admin wrong password",
 			mockData.Admin,
-			entity.UserLogin{
+			&entity.UserLogin{
 				Username: mockData.Admin.Username,
 				Password: "mockData.Admin.Password",
 			},
@@ -295,16 +325,22 @@ func TestUserHandler_Login(t *testing.T) {
 		{
 			"Staff success",
 			mockData.Staff,
-			entity.UserLogin{
+			&entity.UserLogin{
 				Username: mockData.Staff.Username,
 				Password: mockData.Staff.Password,
 			},
 			http.StatusOK,
 		},
 		{
+			"Invalid request body",
+			mockData.Admin,
+			nil,
+			http.StatusBadRequest,
+		},
+		{
 			"Malicious user",
 			mockData.InvalidUser,
-			entity.UserLogin{
+			&entity.UserLogin{
 				Username: "newstaff",
 				Password: "12345",
 			},
@@ -313,12 +349,11 @@ func TestUserHandler_Login(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, _ := tokenUC.Create(tt.user)
-			token = "Bearer " + token
-
-			jsonValue, _ := json.Marshal(tt.req)
+			var jsonValue []byte
+			if tt.req != nil {
+				jsonValue, _ = json.Marshal(tt.req)
+			}
 			req, _ := http.NewRequest("POST", loginpath, bytes.NewBuffer(jsonValue))
-			req.Header.Set("Authorization", token)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 
@@ -343,14 +378,14 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 		name       string
 		user       entity.User
 		targetUuid string
-		req        entity.UpdateUserRequest
+		req        *entity.UpdateUserRequest
 		status     int
 	}{
 		{
 			"Admin update staff",
 			mockData.Admin,
 			mockData.Staff.Uuid,
-			entity.UpdateUserRequest{
+			&entity.UpdateUserRequest{
 				Username: mockData.Staff.Username,
 				Password: "12345sdfsdf",
 				IsAdmin:  true,
@@ -358,10 +393,17 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			http.StatusOK,
 		},
 		{
+			"Admin update invalid data",
+			mockData.Admin,
+			mockData.Staff.Uuid,
+			nil,
+			http.StatusBadRequest,
+		},
+		{
 			"Staff unauthorized",
 			mockData.Staff,
 			mockData.Staff.Uuid,
-			entity.UpdateUserRequest{
+			&entity.UpdateUserRequest{
 				Username: mockData.Staff.Username,
 				Password: "1234sdfsdf5",
 				IsAdmin:  true,
@@ -372,7 +414,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			"Malicious user",
 			mockData.InvalidUser,
 			mockData.Staff.Uuid,
-			entity.UpdateUserRequest{
+			&entity.UpdateUserRequest{
 				Username: "newstaff",
 				Password: "12345",
 				IsAdmin:  false,
@@ -385,7 +427,10 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			token, _ := tokenUC.Create(tt.user)
 			token = "Bearer " + token
 
-			jsonValue, _ := json.Marshal(tt.req)
+			var jsonValue []byte
+			if tt.req != nil {
+				jsonValue, _ = json.Marshal(tt.req)
+			}
 			req, _ := http.NewRequest("PUT", APIPath+tt.targetUuid, bytes.NewBuffer(jsonValue))
 			req.Header.Set("Authorization", token)
 			w := httptest.NewRecorder()

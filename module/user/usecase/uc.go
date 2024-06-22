@@ -73,8 +73,3 @@ func (uc UserUseCase) GetUserByUsername(username string) (*entity.User, error) {
 func (uc UserUseCase) GetUserByUuid(uuid string) (*entity.User, error) {
 	return uc.repo.GetUserByUuid(uuid)
 }
-
-func (uc UserUseCase) Logout(username string) error {
-	// TODO implement me
-	panic("implement me")
-}

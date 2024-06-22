@@ -26,7 +26,7 @@ type IUserRepo interface {
 type IUserUseCase interface {
 	Create(u User) (*User, error)
 	Login(u User) (string, error)
-	Logout(uuid string) error
+	//Logout(uuid string) error
 	GetUserByUsername(username string) (*User, error)
 	GetUserByUuid(uuid string) (*User, error)
 	GetList() ([]User, error)

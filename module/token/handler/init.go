@@ -47,11 +47,11 @@ func (h TokenHandler) Authenticate(c *gin.Context) {
 
 func (h TokenHandler) AdminAuthorize(c *gin.Context) {
 
-	isAdmin, ok := c.Get("isAdmin")
-	if !ok {
-		utils.HandleError(c, http.StatusInternalServerError, errors.New("cannot get role in middleware"))
-		return
-	}
+	isAdmin, _ := c.Get("isAdmin")
+	//if !ok {
+	//	utils.HandleError(c, http.StatusInternalServerError, errors.New("cannot get role in middleware"))
+	//	return
+	//}
 
 	if !isAdmin.(bool) {
 		utils.HandleError(c, http.StatusUnauthorized, errors.New("unauthorized"))
