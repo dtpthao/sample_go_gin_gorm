@@ -307,7 +307,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 	mockData := test.NewMockData()
 	router, tokenUC, handler := Setup(mockData)
 
-	router.POST(APIPath+":uuid", handler.UpdateUser)
+	router.PUT(APIPath+":uuid", handler.UpdateUser)
 
 	tests := []struct {
 		name       string
@@ -356,7 +356,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			token = "Bearer " + token
 
 			jsonValue, _ := json.Marshal(tt.req)
-			req, _ := http.NewRequest("POST", APIPath+tt.targetUuid, bytes.NewBuffer(jsonValue))
+			req, _ := http.NewRequest("PUT", APIPath+tt.targetUuid, bytes.NewBuffer(jsonValue))
 			req.Header.Set("Authorization", token)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)

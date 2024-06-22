@@ -127,13 +127,13 @@ func (h ContractHandler) Delete(context *gin.Context) {
 	if isAdmin {
 		err = h.uc.Delete(cUuid)
 		if err != nil {
-			utils.HandleError(context, http.StatusInternalServerError, err)
+			utils.HandleError(context, http.StatusInternalServerError, err) // fixme either internal or badrequest
 			return
 		}
 	} else {
 		err = h.uc.DeleteByUser(cUuid, userUuid)
 		if err != nil {
-			utils.HandleError(context, http.StatusInternalServerError, err)
+			utils.HandleError(context, http.StatusInternalServerError, err) // fixme either internal or badrequest
 			return
 		}
 	}
