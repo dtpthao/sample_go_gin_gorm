@@ -108,6 +108,7 @@ func (h UserHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 
+	c.Header("message", "{\"success\": true}")
 	c.JSON(http.StatusNoContent, entity.DeleteUserResponse{Success: true})
 }
 

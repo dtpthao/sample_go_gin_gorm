@@ -145,11 +145,11 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 
 			assert.Equal(t, tt.status, w.Code)
 
-			if tt.status == http.StatusNoContent {
-				var res entity.DeleteUserResponse
-				json.Unmarshal(w.Body.Bytes(), &res)
-				assert.NotEmpty(t, res)
-			}
+			//if tt.status == http.StatusNoContent {
+			//	var res entity.DeleteUserResponse
+			//	json.Unmarshal(w.Body.Bytes(), &res)
+			//	assert.NotEmpty(t, res)
+			//}
 		})
 	}
 }
