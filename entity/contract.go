@@ -9,6 +9,7 @@ type Contract struct {
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at,omitempty" time_format:"2006-01-02 15:04:05"`
 	UpdatedAt   time.Time `json:"updated_at,omitempty"  time_format:"2006-01-02 15:04:05"`
+	DeletedAt   bool      `json:"deleted_at,omitempty"`
 }
 
 type NewContractRequest struct {

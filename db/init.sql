@@ -4,9 +4,9 @@ CREATE TABLE users
     username   varchar(128) UNIQUE            NOT NULL,
     password   varchar(255)                   not null,
     is_admin   bool DEFAULT false,
-    active     boolean,
     created_at datetime(3),
-    updated_at datetime(3)
+    updated_at datetime(3),
+    deleted_at bool
 );
 
 CREATE TABLE contracts
@@ -17,5 +17,6 @@ CREATE TABLE contracts
     description text,
     created_at  datetime(3),
     updated_at  datetime(3),
-    FOREIGN KEY (user_uuid) REFERENCES users (uuid)
+    deleted_at  bool,
+    FOREIGN KEY (user_uuid) REFERENCES users (uuid) ON DELETE CASCADE
 )

@@ -4,18 +4,20 @@ import (
 	"errors"
 	"glintecoTask/entity"
 	"gorm.io/gorm"
+	"gorm.io/plugin/soft_delete"
 	"time"
 )
 
 const TableContract = "contracts"
 
 type ContractRepository struct {
-	Uuid        string    `gorm:"primaryKey;column:uuid"`
-	Name        string    `gorm:"column:name"`
-	UserUuid    string    `gorm:"column:user_uuid"`
-	Description string    `gorm:"column:description"`
-	CreatedAt   time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt   time.Time `gorm:"autoCreateTime;column:updated_at"`
+	Uuid        string                `gorm:"primaryKey;column:uuid"`
+	Name        string                `gorm:"column:name"`
+	UserUuid    string                `gorm:"column:user_uuid"`
+	Description string                `gorm:"column:description"`
+	CreatedAt   time.Time             `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt   time.Time             `gorm:"autoCreateTime;column:updated_at"`
+	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:flag"`
 	db          *gorm.DB
 }
 

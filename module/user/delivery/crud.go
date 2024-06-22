@@ -39,7 +39,6 @@ func (h UserHandler) CreateUser(c *gin.Context) {
 		Username: userReq.Username,
 		Password: userReq.Password, // todo hash password from frontend?
 		IsAdmin:  userReq.IsAdmin,
-		Active:   true,
 	}
 
 	user, err := h.uc.Create(newUser)

@@ -4,19 +4,20 @@ import (
 	"errors"
 	"glintecoTask/entity"
 	"gorm.io/gorm"
+	"gorm.io/plugin/soft_delete"
 	"time"
 )
 
 const TableUsers = "users"
 
 type UserRepository struct {
-	Uuid      string    `gorm:"primaryKey;column:uuid"`
-	Username  string    `gorm:"column:username"`
-	Password  string    `gorm:"column:password"`
-	IsAdmin   bool      `gorm:"column:is_admin"`
-	Active    bool      `gorm:"column:active"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoCreateTime;column:updated_at"`
+	Uuid      string                `gorm:"primaryKey;column:uuid"`
+	Username  string                `gorm:"column:username"`
+	Password  string                `gorm:"column:password"`
+	IsAdmin   bool                  `gorm:"column:is_admin"`
+	CreatedAt time.Time             `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt time.Time             `gorm:"autoCreateTime;column:updated_at"`
+	DeletedAt soft_delete.DeletedAt `gorm:"softDelete:flag"`
 	db        *gorm.DB
 }
 
@@ -26,7 +27,6 @@ func (r UserRepository) FromEntity(u entity.User) UserRepository {
 		Username: u.Username,
 		Password: u.Password,
 		IsAdmin:  u.IsAdmin,
-		Active:   u.Active,
 	}
 }
 
@@ -40,7 +40,6 @@ func (r UserRepository) ToEntity() *entity.User {
 		Username: r.Username,
 		Password: r.Password,
 		IsAdmin:  r.IsAdmin,
-		Active:   r.Active,
 	}
 }
 
@@ -74,7 +73,7 @@ func (r UserRepository) Delete(uuid string) error {
 		return tx.Error
 	}
 
-	res := tx.Table(TableUsers).Where("uuid = ?", uuid).Update("active", false)
+	res := tx.Table(TableUsers).Where("uuid = ?", uuid).Delete(&UserRepository{})
 	if res.Error != nil {
 		return res.Error
 	}
