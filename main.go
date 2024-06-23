@@ -93,6 +93,7 @@ func main() {
 	cHandler := cH.NewContractHandler(app, cUseCase)
 	cHandler.RegisterHandler(tokenHandler.Authenticate)
 
+	gin.SetMode(gin.ReleaseMode)
 	addr := fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port)
 	apiLog.Info().Msg("Server start at: http://" + addr)
 	err = app.Run(addr)
