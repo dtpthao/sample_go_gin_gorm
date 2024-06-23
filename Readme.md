@@ -1,15 +1,15 @@
 # Draft instruction
 
 
-### How to run:
+## How to run:
 1. Create docker database service: `docker-compose up -d`
 2. Attach database container and create tables from `db/init.sql`
 3. Run program `go run main.go`
 
 
-### APIs
+## APIs
 
-#### Login
+### Login
 ```
 POST /accounts/login
 ```
@@ -29,7 +29,7 @@ Response: status OK (200)
 ```
 
 
-#### User APIs with admin privilege
+### User APIs with admin privilege
 As a admin, I can create/update/view list/view detail/delete contracts and staffs.
 
 - Create new user:
@@ -130,11 +130,114 @@ Response status: NoContent (204)
 Response header: `"message": {"success": true}`
 
 
-#### Contract APIs for logged in user
 
-	//- As a staff, I can create/update/view list/view detail/delete contracts.
-	//* POST /api/contracts/ (create)
-	//* GET /api/contracts/ (get list)
-	//* PATCH/PUT /api/contracts/<id>/ (update)
-	//* GET /api/contracts/<id>/ (get detail)
-	//* DELETE /api/contracts/<id>/ (delete)
+### Contract APIs for logged in user
+
+As a staff, I can create/update/view list/view detail/delete contracts.
+
+- Create new contract:
+```
+POST /api/contracts/ (create)
+```
+Header authorization: `Bearer [token]`
+
+Request:
+```json
+{
+  "username": "newuser",
+  "password": "12345",
+  "is_admin": false
+}
+```
+
+Response: status OK (200)
+
+- Get user's contracts list:
+```
+GET /api/contracts/ (get list)
+```
+Header authorization: `Bearer [token]`
+
+Request: None
+
+Response: status OK (200)
+```json
+[
+  {
+    "uuid": "4fb66a7c-f23a-4f4f-9b4e-528c77863df0",
+    "name": "admincontract2",
+    "user_uuid": "123456",
+    "description": "alksjfsdfsaasslkf2453252jlskjflksjflksdaaaaaaaaaflskj",
+    "created_at": "2024-06-22T16:30:57.345+07:00",
+    "updated_at": "2024-06-22T16:30:57.345+07:00",
+    "deleted_at": true
+  },
+  {
+    "uuid": "7e431d60-e00c-43d2-af49-6ffaf807f4cc",
+    "name": "admincontract",
+    "user_uuid": "123456",
+    "description": "alksjfsdfsslkfjlskjflksjflksdaaaaaaaaaflskj",
+    "created_at": "2024-06-22T16:30:39.745+07:00",
+    "updated_at": "2024-06-22T16:30:39.745+07:00"
+  },
+  {
+    "uuid": "d314f579-bf2b-4121-b371-bc9f3b39c85e",
+    "name": "admincontract1",
+    "user_uuid": "123456",
+    "description": "alksjfsdfsslkf2453252jlskjflksjflksdaaaaaaaaaflskj",
+    "created_at": "2024-06-22T16:30:51.511+07:00",
+    "updated_at": "2024-06-22T16:30:51.511+07:00"
+  }
+]
+```
+
+- Get user's contract details:
+```
+GET /api/contracts/<id>/ (get detail)
+```
+
+Header authorization: `Bearer [token]`
+
+Request: `<id>` - contract's uuid
+
+Response: status OK (200)
+```json
+{
+  "uuid": "7e431d60-e00c-43d2-af49-6ffaf807f4cc",
+  "name": "admincontract",
+  "user_uuid": "123456",
+  "description": "alksjfsdfsslkfjlskjflksjflksdaaaaaaaaaflskj",
+  "created_at": "2024-06-22T16:30:39.745+07:00",
+  "updated_at": "2024-06-22T16:30:39.745+07:00"
+}
+```
+
+- Update contract:
+```
+PUT /api/contracts/<id>/ (update)
+```
+
+Header authorization: `Bearer [token]`
+
+Request: `<id>` - contract's uuid
+```json
+{
+  "name": "new contract",
+  "description": "cccccccccccccc"
+}
+```
+
+Response: status OK (200)
+
+- Delete user:
+```
+/api/contracts/<id>/ (delete)
+```
+Header authorization: `Bearer [token]`
+
+Request: `<id>` - contract's uuid
+
+Response status: NoContent (204)
+Response header: `"message": {"success": true}`
+
+
