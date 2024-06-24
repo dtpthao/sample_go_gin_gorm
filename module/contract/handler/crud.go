@@ -126,15 +126,16 @@ func (h ContractHandler) Delete(context *gin.Context) {
 
 	cUuid := context.Param("uuid")
 
-	userUuid, _, err := utils.GetMiddlewareValues(context)
+	userUuid, isAdmin, err := utils.GetMiddlewareValues(context)
 	//if err != nil {
 	//	utils.HandleError(context, http.StatusInternalServerError, err)
 	//	return
 	//}
 
 	kafkaMsg := entity.KafkaContractDeleteMessage{
-		ActionUserUuid: userUuid,
-		ContractUuid:   cUuid,
+		ActionUserIsAdmin: isAdmin,
+		ActionUserUuid:    userUuid,
+		ContractUuid:      cUuid,
 	}
 
 	value, err := json.Marshal(&kafkaMsg)
