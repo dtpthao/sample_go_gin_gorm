@@ -3,18 +3,32 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"glintecoTask/entity"
+	"glintecoTask/kafka"
 )
+
+const DeleteContractTopic = "delete-contract"
 
 type ContractHandler struct {
 	uc     entity.IContractUseCase
 	router *gin.RouterGroup
+	kafka  entity.IKafkaService
 }
 
-func NewContractHandler(app *gin.Engine, uc entity.IContractUseCase) ContractHandler {
+func NewContractHandler(app *gin.Engine, uc entity.IContractUseCase, kafkaConfig entity.KafkaConfig) (ContractHandler, error) {
+
+	kafkaConsumerHandler := NewKafkaContractHandler(uc)
+	kafkaService, err := kafka.NewKafkaService(kafkaConfig, []string{DeleteContractTopic}, kafkaConsumerHandler)
+	if err != nil {
+		return ContractHandler{}, err
+	}
+
+	go kafkaService.Listen()
+
 	return ContractHandler{
 		uc:     uc,
 		router: app.Group("/api/contracts"),
-	}
+		kafka:  kafkaService,
+	}, nil
 }
 
 func (h ContractHandler) RegisterHandler(middlewares ...gin.HandlerFunc) {

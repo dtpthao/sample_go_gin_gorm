@@ -25,6 +25,7 @@ import (
 var logConfig apiLog.Config
 var mysqlConfig entity.MysqlConfig
 var serverConfig entity.ServerConfig
+var kafkaConfig entity.KafkaConfig
 
 func readConfig() {
 	err := cleanenv.ReadEnv(&logConfig)
@@ -50,6 +51,12 @@ func readConfig() {
 		Host:      "localhost",
 		Port:      3030,
 		JWTSecret: "5b0b18dc37004b97946367ca5d82673918a6c6e7a817bf84236abe1c0907b9bf",
+	}
+
+	kafkaConfig = entity.KafkaConfig{
+		BrokerHost:      "localhost",
+		BrokerPort:      "9093",
+		ConsumerGroupID: "my-group",
 	}
 }
 
@@ -103,13 +110,17 @@ func main() {
 	// contract
 	cRepository := cRepo.NewContractRepository(db)
 	cUseCase := cUC.NewContractUseCase(cRepository)
-	cHandler := cH.NewContractHandler(app, cUseCase)
+	cHandler, err := cH.NewContractHandler(app, cUseCase, kafkaConfig)
+	if err != nil {
+		panic(err)
+	}
+
 	cHandler.RegisterHandler(tokenHandler.Authenticate)
 
 	gin.SetMode(gin.ReleaseMode)
 	addr := fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port)
 	apiLog.Info().Msg("Server start at: http://" + addr)
-	err := app.Run(addr)
+	err = app.Run(addr)
 
 	if err != nil {
 		panic(err)

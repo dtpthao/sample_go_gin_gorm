@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"glintecoTask/entity"
@@ -125,24 +126,27 @@ func (h ContractHandler) Delete(context *gin.Context) {
 
 	cUuid := context.Param("uuid")
 
-	userUuid, isAdmin, err := utils.GetMiddlewareValues(context)
+	userUuid, _, err := utils.GetMiddlewareValues(context)
 	//if err != nil {
 	//	utils.HandleError(context, http.StatusInternalServerError, err)
 	//	return
 	//}
 
-	if isAdmin {
-		err = h.uc.Delete(cUuid)
-		if err != nil {
-			utils.HandleError(context, http.StatusInternalServerError, err) // fixme either internal or badrequest
-			return
-		}
-	} else {
-		err = h.uc.DeleteByUser(cUuid, userUuid)
-		if err != nil {
-			utils.HandleError(context, http.StatusInternalServerError, err) // fixme either internal or badrequest
-			return
-		}
+	kafkaMsg := entity.KafkaContractDeleteMessage{
+		ActionUserUuid: userUuid,
+		ContractUuid:   cUuid,
+	}
+
+	value, err := json.Marshal(&kafkaMsg)
+	if err != nil {
+		utils.HandleError(context, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = h.kafka.Post(DeleteContractTopic, value)
+	if err != nil {
+		utils.HandleError(context, http.StatusInternalServerError, err)
+		return
 	}
 
 	context.Header("message", "{\"success\": true}")

@@ -27,6 +27,8 @@ func (s Service) Post(topic string, jsonMsg []byte) error {
 	return s.Producer.Post(topic, jsonMsg)
 }
 
-func (s Service) Consume() error {
-	return s.Consume()
+func (s Service) Listen() {
+	for {
+		s.Consumer.Consume()
+	}
 }
