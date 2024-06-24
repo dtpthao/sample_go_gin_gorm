@@ -11,7 +11,7 @@ type User struct {
 	IsAdmin   bool      `json:"is_admin,default=false"`
 	CreatedAt time.Time `json:"created_at,omitempty" time_format:"2006-01-02 15:04:05"`
 	UpdatedAt time.Time `json:"updated_at,omitempty" time_format:"2006-01-02 15:04:05"`
-	DeletedAt bool      `json:"deleted_at,omitempty"`
+	IsDeleted bool      `json:"is_deleted,omitempty"`
 }
 
 type IUserRepo interface {

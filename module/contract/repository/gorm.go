@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"glintecoTask/entity"
+	"glintecoTask/module/user/repository"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 	"time"
@@ -11,13 +12,14 @@ import (
 const TableContract = "contracts"
 
 type Contract struct {
-	Uuid        string                `gorm:"primaryKey;column:uuid"`
-	Name        string                `gorm:"column:name"`
-	UserUuid    string                `gorm:"column:user_uuid"`
+	Uuid        string                `gorm:"size:36;primaryKey;column:uuid"`
+	Name        string                `gorm:"size:255;column:name"`
+	UserUuid    string                `gorm:"size:36;not null;index"`
 	Description string                `gorm:"column:description"`
 	CreatedAt   time.Time             `gorm:"autoCreateTime;column:created_at"`
 	UpdatedAt   time.Time             `gorm:"autoCreateTime;column:updated_at"`
-	IsDeleted   soft_delete.DeletedAt `gorm:"softDelete:flag"`
+	IsDeleted   soft_delete.DeletedAt `gorm:"size:1;softDelete:flag"`
+	User        repository.User       `gorm:"foreignKey:UserUuid;references:Uuid;OnUpdate:CASCADE;OnDelete:CASCADE"`
 	db          *gorm.DB
 }
 

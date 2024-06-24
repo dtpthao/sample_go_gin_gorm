@@ -11,13 +11,13 @@ import (
 const TableUsers = "users"
 
 type User struct {
-	Uuid      string                `gorm:"primaryKey"`
-	Username  string                //`gorm:"column:username"`
-	Password  string                //`gorm:"column:password"`
+	Uuid      string                `gorm:"size:36;primaryKey"`
+	Username  string                `gorm:"size:64;unique;not null;column:username"`
+	Password  string                `gorm:"size:128;column:password"`
 	IsAdmin   bool                  //`gorm:"column:is_admin"`
 	CreatedAt time.Time             `gorm:"autoCreateTime"`
 	UpdatedAt time.Time             `gorm:"autoCreateTime"`
-	IsDeleted soft_delete.DeletedAt `gorm:"softDelete:flag"`
+	IsDeleted soft_delete.DeletedAt `gorm:"size:1;softDelete:flag"`
 	db        *gorm.DB
 }
 

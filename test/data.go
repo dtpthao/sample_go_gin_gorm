@@ -47,7 +47,7 @@ func NewMockData() MockData {
 		IsAdmin:   true,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
-		DeletedAt: false,
+		IsDeleted: false,
 	}
 
 	createdAt, _ = time.Parse(time.RFC3339, "2024-06-22T16:24:58.743+07:00")
@@ -59,7 +59,7 @@ func NewMockData() MockData {
 		IsAdmin:   false,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
-		DeletedAt: false,
+		IsDeleted: false,
 	}
 
 	m.InvalidUser = entity.User{
@@ -69,7 +69,7 @@ func NewMockData() MockData {
 		IsAdmin:   false,
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
-		DeletedAt: false,
+		IsDeleted: false,
 	}
 
 	acUuid := m.AdminContractsUuid()
@@ -82,7 +82,7 @@ func NewMockData() MockData {
 			Description: "Description Admin Contract 1",
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
-			DeletedAt:   false,
+			IsDeleted:   false,
 		},
 		{
 			Uuid:        acUuid[1],
@@ -91,7 +91,7 @@ func NewMockData() MockData {
 			Description: "Description Admin Contract 2",
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
-			DeletedAt:   false,
+			IsDeleted:   false,
 		},
 	}
 
@@ -103,7 +103,7 @@ func NewMockData() MockData {
 			Description: "Description Staff Contract 1",
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
-			DeletedAt:   false,
+			IsDeleted:   false,
 		},
 		{
 			Uuid:        scUuid[1],
@@ -112,7 +112,7 @@ func NewMockData() MockData {
 			Description: "Description Staff Contract 2",
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
-			DeletedAt:   false,
+			IsDeleted:   false,
 		},
 		{
 			Uuid:        scUuid[2],
@@ -121,7 +121,7 @@ func NewMockData() MockData {
 			Description: "Description Staff Contract 3",
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
-			DeletedAt:   false,
+			IsDeleted:   false,
 		},
 	}
 
