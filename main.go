@@ -19,13 +19,14 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	"time"
 )
 
 var logConfig apiLog.Config
 var mysqlConfig entity.MysqlConfig
 var serverConfig entity.ServerConfig
 
-func config() {
+func readConfig() {
 	err := cleanenv.ReadEnv(&logConfig)
 	if err != nil {
 		log.Fatalf("Read log config failed. %v", err)
@@ -52,10 +53,7 @@ func config() {
 	}
 }
 
-func main() {
-
-	config()
-
+func SetupDatabase() *gorm.DB {
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", mysqlConfig.User, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.DBName)
 	gormConfig := gorm.Config{}
 	gormConfig.DisableNestedTransaction = true
@@ -71,6 +69,21 @@ func main() {
 	}
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	err = db.AutoMigrate(&uRepo.User{}, &cRepo.Contract{})
+	if err != nil {
+		log.Fatalf("Cannot migrate tables. %v", err)
+	}
+
+	return db
+}
+
+func main() {
+
+	readConfig()
+
+	db := SetupDatabase()
 
 	jwtSecret, _ := hex.DecodeString(serverConfig.JWTSecret)
 	tokenUseCase := tUC.NewTokenUseCase(jwtSecret)
@@ -96,7 +109,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	addr := fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port)
 	apiLog.Info().Msg("Server start at: http://" + addr)
-	err = app.Run(addr)
+	err := app.Run(addr)
 
 	if err != nil {
 		panic(err)

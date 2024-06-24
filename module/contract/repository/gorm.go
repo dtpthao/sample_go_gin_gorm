@@ -10,23 +10,23 @@ import (
 
 const TableContract = "contracts"
 
-type ContractRepository struct {
+type Contract struct {
 	Uuid        string                `gorm:"primaryKey;column:uuid"`
 	Name        string                `gorm:"column:name"`
 	UserUuid    string                `gorm:"column:user_uuid"`
 	Description string                `gorm:"column:description"`
 	CreatedAt   time.Time             `gorm:"autoCreateTime;column:created_at"`
 	UpdatedAt   time.Time             `gorm:"autoCreateTime;column:updated_at"`
-	DeletedAt   soft_delete.DeletedAt `gorm:"softDelete:flag"`
+	IsDeleted   soft_delete.DeletedAt `gorm:"softDelete:flag"`
 	db          *gorm.DB
 }
 
 func NewContractRepository(db *gorm.DB) entity.IContractRepository {
-	return ContractRepository{db: db}
+	return Contract{db: db}
 }
 
-func (r ContractRepository) FromEntity(c entity.Contract) ContractRepository {
-	return ContractRepository{
+func (r Contract) FromEntity(c entity.Contract) Contract {
+	return Contract{
 		Uuid:        c.Uuid,
 		Name:        c.Name,
 		UserUuid:    c.UserUuid,
@@ -36,7 +36,7 @@ func (r ContractRepository) FromEntity(c entity.Contract) ContractRepository {
 	}
 }
 
-func (r ContractRepository) ToEntity() *entity.Contract {
+func (r Contract) ToEntity() *entity.Contract {
 	return &entity.Contract{
 		Uuid:        r.Uuid,
 		Name:        r.Name,
@@ -47,25 +47,25 @@ func (r ContractRepository) ToEntity() *entity.Contract {
 	}
 }
 
-func (r ContractRepository) Add(c entity.Contract) (*entity.Contract, error) {
+func (r Contract) Add(c entity.Contract) (*entity.Contract, error) {
 	cr := r.FromEntity(c)
 	err := r.db.Table(TableContract).Create(&cr).Error
 	return cr.ToEntity(), err
 }
 
-func (r ContractRepository) GetListByUser(uUuid string) ([]entity.Contract, error) {
+func (r Contract) GetListByUser(uUuid string) ([]entity.Contract, error) {
 	var contracts []entity.Contract
 	err := r.db.Table(TableContract).Where("user_uuid = ?", uUuid).Find(&contracts).Error
 	return contracts, err
 }
 
-func (r ContractRepository) GetList() ([]entity.Contract, error) {
+func (r Contract) GetList() ([]entity.Contract, error) {
 	var contracts []entity.Contract
 	err := r.db.Table(TableContract).Find(&contracts).Error
 	return contracts, err
 }
 
-func (r ContractRepository) Update(cUuid string, data any) error {
+func (r Contract) Update(cUuid string, data any) error {
 	tx := r.db.Begin()
 	if tx.Error != nil {
 		return tx.Error
@@ -90,8 +90,8 @@ func (r ContractRepository) Update(cUuid string, data any) error {
 	return nil
 }
 
-func (r ContractRepository) GetDetails(cUuid string) (*entity.Contract, error) {
-	var res ContractRepository
+func (r Contract) GetDetails(cUuid string) (*entity.Contract, error) {
+	var res Contract
 	err := r.db.Table(TableContract).Where("uuid = ?", cUuid).Take(&res).Error
 	if err != nil {
 		return nil, err
@@ -99,8 +99,8 @@ func (r ContractRepository) GetDetails(cUuid string) (*entity.Contract, error) {
 	return res.ToEntity(), nil
 }
 
-func (r ContractRepository) Delete(cUuid string) error {
-	c := ContractRepository{Uuid: cUuid}
+func (r Contract) Delete(cUuid string) error {
+	c := Contract{Uuid: cUuid}
 
 	tx := r.db.Begin()
 	if tx.Error != nil {
@@ -121,8 +121,8 @@ func (r ContractRepository) Delete(cUuid string) error {
 	return nil
 }
 
-func (r ContractRepository) DeleteByUser(cUuid string, uUuid string) error {
-	c := ContractRepository{Uuid: cUuid}
+func (r Contract) DeleteByUser(cUuid string, uUuid string) error {
+	c := Contract{Uuid: cUuid}
 
 	tx := r.db.Begin()
 	if tx.Error != nil {

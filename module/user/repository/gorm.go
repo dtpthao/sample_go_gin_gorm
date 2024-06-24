@@ -10,19 +10,19 @@ import (
 
 const TableUsers = "users"
 
-type UserRepository struct {
-	Uuid      string                `gorm:"primaryKey;column:uuid"`
-	Username  string                `gorm:"column:username"`
-	Password  string                `gorm:"column:password"`
-	IsAdmin   bool                  `gorm:"column:is_admin"`
-	CreatedAt time.Time             `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time             `gorm:"autoCreateTime;column:updated_at"`
-	DeletedAt soft_delete.DeletedAt `gorm:"softDelete:flag"`
+type User struct {
+	Uuid      string                `gorm:"primaryKey"`
+	Username  string                //`gorm:"column:username"`
+	Password  string                //`gorm:"column:password"`
+	IsAdmin   bool                  //`gorm:"column:is_admin"`
+	CreatedAt time.Time             `gorm:"autoCreateTime"`
+	UpdatedAt time.Time             `gorm:"autoCreateTime"`
+	IsDeleted soft_delete.DeletedAt `gorm:"softDelete:flag"`
 	db        *gorm.DB
 }
 
-func (r UserRepository) FromEntity(u entity.User) UserRepository {
-	return UserRepository{
+func (r User) FromEntity(u entity.User) User {
+	return User{
 		Uuid:     u.Uuid,
 		Username: u.Username,
 		Password: u.Password,
@@ -31,10 +31,10 @@ func (r UserRepository) FromEntity(u entity.User) UserRepository {
 }
 
 func NewUserRepository(db *gorm.DB) entity.IUserRepo {
-	return &UserRepository{db: db}
+	return &User{db: db}
 }
 
-func (r UserRepository) ToEntity() *entity.User {
+func (r User) ToEntity() *entity.User {
 	return &entity.User{
 		Uuid:     r.Uuid,
 		Username: r.Username,
@@ -43,14 +43,14 @@ func (r UserRepository) ToEntity() *entity.User {
 	}
 }
 
-func (r UserRepository) Create(u entity.User) (*entity.User, error) {
+func (r User) Create(u entity.User) (*entity.User, error) {
 	ur := r.FromEntity(u)
 	err := r.db.Table(TableUsers).Create(&ur).Error
 	return ur.ToEntity(), err
 }
 
-func (r UserRepository) GetUserByUsername(username string) (*entity.User, error) {
-	var res UserRepository
+func (r User) GetUserByUsername(username string) (*entity.User, error) {
+	var res User
 	err := r.db.Table(TableUsers).Where("username = ?", username).Take(&res).Error
 	if err != nil {
 		return nil, err
@@ -58,8 +58,8 @@ func (r UserRepository) GetUserByUsername(username string) (*entity.User, error)
 	return res.ToEntity(), nil
 }
 
-func (r UserRepository) GetUserByUuid(uuid string) (*entity.User, error) {
-	var res UserRepository
+func (r User) GetUserByUuid(uuid string) (*entity.User, error) {
+	var res User
 	err := r.db.Table(TableUsers).Where("uuid = ?", uuid).Take(&res).Error
 	if err != nil {
 		return nil, err
@@ -67,13 +67,13 @@ func (r UserRepository) GetUserByUuid(uuid string) (*entity.User, error) {
 	return res.ToEntity(), nil
 }
 
-func (r UserRepository) Delete(uuid string) error {
+func (r User) Delete(uuid string) error {
 	tx := r.db.Begin()
 	if tx.Error != nil {
 		return tx.Error
 	}
 
-	res := tx.Table(TableUsers).Where("uuid = ?", uuid).Delete(&UserRepository{})
+	res := tx.Table(TableUsers).Where("uuid = ?", uuid).Delete(&User{})
 	if res.Error != nil {
 		return res.Error
 	}
@@ -91,13 +91,13 @@ func (r UserRepository) Delete(uuid string) error {
 	return nil
 }
 
-func (r UserRepository) GetList() ([]entity.User, error) {
+func (r User) GetList() ([]entity.User, error) {
 	var users []entity.User
 	err := r.db.Table(TableUsers).Find(&users).Error
 	return users, err
 }
 
-func (r UserRepository) Update(uuid string, data map[string]any) error {
+func (r User) Update(uuid string, data map[string]any) error {
 
 	tx := r.db.Begin()
 	if tx.Error != nil {
