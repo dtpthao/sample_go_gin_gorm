@@ -14,6 +14,7 @@ type Contract struct {
 
 type NewContractRequest struct {
 	Name        string `json:"name" binding:"required"`
+	UserUuid    string `json:"user_uuid" binding:"required"`
 	Description string `json:"description"`
 }
 
@@ -45,7 +46,7 @@ type DeleteContractResponse struct {
 //* DELETE /api/contracts/<id>/ (delete)
 
 type IContractUseCase interface {
-	CreateNew(uUuid string, c NewContractRequest) (*Contract, error)
+	CreateNew(c NewContractRequest) (*Contract, error)
 	GetListByUser(userUuid string) ([]Contract, error)
 	Update(cUuid string, c UpdateContractRequest) error
 	GetDetails(cUuid string) (*Contract, error)

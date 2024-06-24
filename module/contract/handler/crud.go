@@ -18,13 +18,20 @@ func (h ContractHandler) CreateNew(context *gin.Context) {
 		return
 	}
 
-	userUuid, _, err := utils.GetMiddlewareValues(context)
+	actionUserUuid, isAdmin, err := utils.GetMiddlewareValues(context)
 	//if err != nil { // todo not input but code logic error - commented out to increase output test coverage
 	//	utils.HandleError(context, http.StatusInternalServerError, err)
 	//	return
 	//}
 
-	newContract, err := h.uc.CreateNew(userUuid, cReq)
+	if !isAdmin {
+		if actionUserUuid != cReq.UserUuid {
+			utils.HandleError(context, http.StatusBadRequest, errors.New("you cannot create contract for others"))
+			return
+		}
+	}
+
+	newContract, err := h.uc.CreateNew(cReq)
 	if err != nil {
 		utils.HandleError(context, http.StatusInternalServerError, err)
 		return
