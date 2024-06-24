@@ -343,7 +343,7 @@ func TestContractHandler_UpdateContract(t *testing.T) {
 			http.StatusInternalServerError,
 		},
 		{
-			"Staff update their's contract",
+			"Staff update their contract",
 			mockData.Staff,
 			mockData.StaffContractsUuid()[0],
 			&entity.UpdateContractRequest{

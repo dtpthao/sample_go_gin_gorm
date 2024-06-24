@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"glintecoTask/entity"
 	"glintecoTask/utils"
 	"net/http"
@@ -35,7 +34,7 @@ func (h UserHandler) CreateUser(c *gin.Context) {
 
 	// todo validate input
 	newUser := entity.User{
-		Uuid:     uuid.New().String(),
+		Uuid:     utils.NewUuid(),
 		Username: userReq.Username,
 		Password: userReq.Password, // todo hash password from frontend?
 		IsAdmin:  userReq.IsAdmin,
