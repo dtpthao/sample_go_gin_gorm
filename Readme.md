@@ -3,8 +3,8 @@
 
 ## How to run:
 1. Create docker database service: `docker-compose up -d`
-2. Attach database container and create tables from `db/init.sql`
-3. Run program `go run main.go`
+2. Run program `go run main.go`
+3. Seed admin user: `go run seeds/main.go [newusername] [password]`
 
 
 ## APIs
