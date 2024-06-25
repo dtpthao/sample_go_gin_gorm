@@ -16,7 +16,7 @@ type User struct {
 	Password  string                `gorm:"size:128;column:password"`
 	IsAdmin   bool                  //`gorm:"column:is_admin"`
 	CreatedAt time.Time             `gorm:"autoCreateTime"`
-	UpdatedAt time.Time             `gorm:"autoCreateTime"`
+	UpdatedAt time.Time             `gorm:"autoUpdateTime"`
 	IsDeleted soft_delete.DeletedAt `gorm:"size:1;softDelete:flag"`
 	db        *gorm.DB
 }
@@ -44,8 +44,23 @@ func (r User) ToEntity() *entity.User {
 }
 
 func (r User) Create(u entity.User) (*entity.User, error) {
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
 	ur := r.FromEntity(u)
-	err := r.db.Table(TableUsers).Create(&ur).Error
+	err := tx.Table(TableUsers).Create(&ur).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
 	return ur.ToEntity(), err
 }
 

@@ -13,11 +13,11 @@ const TableContract = "contracts"
 
 type Contract struct {
 	Uuid        string                `gorm:"size:36;primaryKey;column:uuid"`
-	Name        string                `gorm:"size:255;column:name"`
+	Name        string                `gorm:"size:255;not null;column:name"`
 	UserUuid    string                `gorm:"size:36;not null;index"`
 	Description string                `gorm:"column:description"`
 	CreatedAt   time.Time             `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt   time.Time             `gorm:"autoCreateTime;column:updated_at"`
+	UpdatedAt   time.Time             `gorm:"autoUpdateTime;column:updated_at"`
 	IsDeleted   soft_delete.DeletedAt `gorm:"size:1;softDelete:flag"`
 	User        repository.User       `gorm:"foreignKey:UserUuid;references:Uuid;OnUpdate:CASCADE;OnDelete:CASCADE"`
 	db          *gorm.DB
@@ -50,8 +50,22 @@ func (r Contract) ToEntity() *entity.Contract {
 }
 
 func (r Contract) Add(c entity.Contract) (*entity.Contract, error) {
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 	cr := r.FromEntity(c)
-	err := r.db.Table(TableContract).Create(&cr).Error
+	err := tx.Table(TableContract).Create(&cr).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
 	return cr.ToEntity(), err
 }
 
