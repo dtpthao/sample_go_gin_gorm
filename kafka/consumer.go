@@ -3,7 +3,7 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 	"time"
 
 	"github.com/IBM/sarama"

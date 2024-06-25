@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 	"time"
 )
 

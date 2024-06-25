@@ -3,10 +3,10 @@ package kafka
 import (
 	"encoding/json"
 	"github.com/IBM/sarama"
-	"glintecoTask/entity"
 	"log"
 	"math/rand"
 	"os"
+	"sample-go-server/entity"
 )
 
 type Message struct {

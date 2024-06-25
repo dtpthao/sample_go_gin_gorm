@@ -4,48 +4,38 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/ilyakaznacheev/cleanenv"
-	"glintecoTask/entity"
-	"glintecoTask/kafka"
-	cH "glintecoTask/module/contract/handler"
-	cRepo "glintecoTask/module/contract/repository"
-	cUC "glintecoTask/module/contract/usecase"
-	tH "glintecoTask/module/token/handler"
-	tUC "glintecoTask/module/token/usecase"
-	uH "glintecoTask/module/user/handler"
-	uRepo "glintecoTask/module/user/repository"
-	uUC "glintecoTask/module/user/usecase"
-	apiLog "glintecoTask/utils/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+	"os"
+	"sample-go-server/entity"
+	"sample-go-server/kafka"
+	cH "sample-go-server/module/contract/handler"
+	cRepo "sample-go-server/module/contract/repository"
+	cUC "sample-go-server/module/contract/usecase"
+	tH "sample-go-server/module/token/handler"
+	tUC "sample-go-server/module/token/usecase"
+	uH "sample-go-server/module/user/handler"
+	uRepo "sample-go-server/module/user/repository"
+	uUC "sample-go-server/module/user/usecase"
+	apiLog "sample-go-server/utils/log"
 	"time"
 )
 
-var logConfig apiLog.Config
 var mysqlConfig entity.MysqlConfig
 var serverConfig entity.ServerConfig
 var kafkaConfig entity.KafkaConfig
 
 func readConfig() {
-	err := cleanenv.ReadEnv(&logConfig)
-	if err != nil {
-		log.Fatalf("Read log config failed. %v", err)
-	}
-
-	err = apiLog.InitLog(logConfig)
-	if err != nil {
-		log.Fatalf("Init log failed. %v", err)
-	}
 
 	// todo no hardcode
 	mysqlConfig = entity.MysqlConfig{
 		Host:     "localhost",
 		Port:     3307,
-		User:     "glinteco",
-		Password: "glinteco@123",
-		DBName:   "glintecodb",
+		User:     "docker",
+		Password: "docker@123",
+		DBName:   "dockerdb",
 	}
 
 	serverConfig = entity.ServerConfig{
@@ -121,7 +111,8 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	addr := fmt.Sprintf("%s:%d", serverConfig.Host, serverConfig.Port)
-	apiLog.Info().Msg("Server start at: http://" + addr)
+	log := apiLog.NewLogger(os.Stdout)
+	log.Info("Server start at: http://" + addr)
 	err = app.Run(addr)
 
 	if err != nil {

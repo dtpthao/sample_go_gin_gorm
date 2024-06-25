@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/IBM/sarama"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 )
 
 type KafkaDeleteContractHandler struct {

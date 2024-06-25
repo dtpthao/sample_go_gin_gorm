@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"glintecoTask/entity"
-	"glintecoTask/module/user/repository"
-	"glintecoTask/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"sample-go-server/entity"
+	"sample-go-server/module/user/repository"
+	"sample-go-server/utils"
 )
 
 func OpenConnection(config entity.MysqlConfig) *gorm.DB {
@@ -34,9 +34,9 @@ func main() {
 	config := entity.MysqlConfig{
 		Host:     "localhost",
 		Port:     3307,
-		User:     "glinteco",
-		Password: "glinteco@123",
-		DBName:   "glintecodb",
+		User:     "docker",
+		Password: "docker@123",
+		DBName:   "dockerdb",
 	}
 	db := OpenConnection(config)
 

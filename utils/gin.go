@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"glintecoTask/utils/log"
+	"sample-go-server/utils/log"
 )
 
 type ErrorResponse struct {
@@ -11,7 +11,7 @@ type ErrorResponse struct {
 }
 
 func HandleError(c *gin.Context, status int, err error) {
-	log.Error().Err(err)
+	log.Error(err)
 	// todo response message should be filtered
 	c.AbortWithStatusJSON(status, ErrorResponse{Message: err.Error()})
 }

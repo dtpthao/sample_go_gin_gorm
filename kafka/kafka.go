@@ -3,8 +3,8 @@ package kafka
 import (
 	"encoding/json"
 	"github.com/IBM/sarama"
-	"glintecoTask/entity"
-	"glintecoTask/utils/log"
+	"sample-go-server/entity"
+	"sample-go-server/utils/log"
 )
 
 type Service struct {
@@ -50,7 +50,7 @@ func (s *Service) Listen() {
 	for {
 		err := s.Consumer.Consume()
 		if err != nil {
-			log.Error().Err(err)
+			log.Error(err)
 		}
 	}
 }

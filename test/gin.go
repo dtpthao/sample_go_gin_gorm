@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"glintecoTask/entity"
-	"glintecoTask/utils"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"sample-go-server/entity"
+	"sample-go-server/utils"
 )
 
 type MockGinContext struct {

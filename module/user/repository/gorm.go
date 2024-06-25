@@ -2,9 +2,9 @@ package repository
 
 import (
 	"errors"
-	"glintecoTask/entity"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
+	"sample-go-server/entity"
 	"time"
 )
 

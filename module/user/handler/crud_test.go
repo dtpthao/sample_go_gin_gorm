@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"glintecoTask/entity"
-	handler2 "glintecoTask/module/token/handler"
-	usecase2 "glintecoTask/module/token/usecase"
-	"glintecoTask/module/user/usecase"
-	"glintecoTask/test"
 	"net/http"
 	"net/http/httptest"
+	"sample-go-server/entity"
+	handler2 "sample-go-server/module/token/handler"
+	usecase2 "sample-go-server/module/token/usecase"
+	"sample-go-server/module/user/usecase"
+	"sample-go-server/test"
 	"testing"
 )
 

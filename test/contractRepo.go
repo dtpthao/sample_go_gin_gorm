@@ -2,7 +2,7 @@ package test
 
 import (
 	"errors"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 	"slices"
 )
 

@@ -3,7 +3,7 @@ package kafka
 import (
 	"fmt"
 	"github.com/IBM/sarama"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 )
 
 type Producer struct {

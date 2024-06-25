@@ -1,17 +1,17 @@
 services:
   db:
-    container_name: glintecodb
+    container_name: dockerdb
     image: mysql:8.0
     ports:
       - "3307:3306"
     volumes:
-      - ./dbcache:/var/lib/mysql
+      - ./db:/var/lib/mysql
     command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
     environment:
-      MYSQL_ROOT_PASSWORD: 'glinteco@123'
-      MYSQL_DATABASE: 'glintecodb'
-      MYSQL_USER: 'glinteco'
-      MYSQL_PASSWORD: 'glinteco@123'
+      MYSQL_ROOT_PASSWORD: 'docker@123'
+      MYSQL_DATABASE: 'dockerdb'
+      MYSQL_USER: 'docker'
+      MYSQL_PASSWORD: 'docker@123'
 
   zookeeper:
     restart: always

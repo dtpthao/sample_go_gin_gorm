@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"glintecoTask/entity"
-	"glintecoTask/utils"
 	"net/http"
+	"sample-go-server/entity"
+	"sample-go-server/utils"
 )
 
 func (h UserHandler) Login(c *gin.Context) {

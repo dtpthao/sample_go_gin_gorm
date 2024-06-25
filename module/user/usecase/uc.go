@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"errors"
-	"glintecoTask/entity"
 	"gorm.io/gorm"
+	"sample-go-server/entity"
 )
 
 type UserUseCase struct {

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 )
 
 type UserHandler struct {

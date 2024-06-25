@@ -1,7 +1,7 @@
 package test
 
 import (
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 	"time"
 )
 

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"github.com/google/uuid"
-	"glintecoTask/entity"
+	"sample-go-server/entity"
 )
 
 type ContractUseCase struct {

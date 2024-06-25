@@ -2,8 +2,8 @@ package test
 
 import (
 	"errors"
-	"glintecoTask/entity"
 	"gorm.io/gorm"
+	"sample-go-server/entity"
 )
 
 type UserRepository struct {

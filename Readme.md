@@ -1,10 +1,13 @@
-# Draft instruction
+# Instruction
 
 
 ## How to run:
-1. Create docker database service: `docker-compose up -d`
-2. Run program `go run main.go`
-3. Seed admin user: `go run seeds/main.go [newusername] [password]`
+### Run app on local machine:
+- make sure you have go and docker installed in your computer
+- pull git repository: `git clone https://github.com/dtpthao/Sample-Go-Server.git && cd Sample-Go-Server`
+- Run database and kafka services on docker service: `docker-compose up -d`
+- Seed admin user: `go run seeds/main.go [newusername] [password]`
+- Run program `go run main.go`
 
 
 ## APIs
