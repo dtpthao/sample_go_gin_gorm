@@ -6,27 +6,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AccessLog(c *gin.Context) {
+func AccessLog(ctx *gin.Context) {
+	globalLog.Infof("Request: %v\n",
+		ctx.ClientIP(),
+		ctx.Request.Method,
+		ctx.Request.URL.Path,
+		ctx.Request.Proto,
+		ctx.Request.UserAgent(),
+		ctx.Request.Header.Get("Content-Type"),
+	)
 	start := time.Now()
-	path := c.Request.URL.Path
-	raw := c.Request.URL.RawQuery
-	if raw != "" {
-		path = path + "?" + raw
-	}
-	Log().
-		Str("IP", c.ClientIP()).
-		Str("Method", c.Request.Method).
-		Str("Path", path).
-		Str("Protocol", c.Request.Proto).
-		Str("Agent", c.Request.UserAgent()).
-		Msg("request")
-	c.Next()
-	now := time.Now()
-	Log().
-		Str("IP", c.ClientIP()).
-		Str("Method", c.Request.Method).
-		Str("Path", path).
-		Int("Response code", c.Writer.Status()).
-		Str("Latency", now.Sub(start).String()).
-		Msg("response")
+	ctx.Next()
+	globalLog.Infof("Response: %v\n",
+		ctx.ClientIP(),
+		ctx.Writer.Status(),
+		ctx.Request.URL.Path,
+		time.Since(start).String(),
+		ctx.Writer.Header().Get("Content-Type"),
+	)
 }
