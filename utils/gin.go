@@ -17,12 +17,12 @@ func HandleError(c *gin.Context, status int, err error) {
 }
 
 func GetMiddlewareValues(c *gin.Context) (userUuid string, isAdmin bool, err error) {
-	role, ok := c.Get("isAdmin")
+	role, ok := c.Get(MiddlewareUserRoleKey)
 	if !ok {
 		return "", false, errors.New("cannot get user role")
 	}
 
-	uUuid, ok := c.Get("userUuid")
+	uUuid, ok := c.Get(MiddlewareUserUuidKey)
 	if !ok {
 		return "", false, errors.New("cannot get user uuid")
 	}

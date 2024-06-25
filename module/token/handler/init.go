@@ -39,15 +39,15 @@ func (h TokenHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
-	c.Set("userUuid", user.Uuid)
-	c.Set("username", user.Username)
-	c.Set("isAdmin", user.IsAdmin)
+	c.Set(utils.MiddlewareUserUuidKey, user.Uuid)
+	c.Set(utils.MiddlewareUsernameKey, user.Username)
+	c.Set(utils.MiddlewareUserRoleKey, user.IsAdmin)
 	c.Next()
 }
 
 func (h TokenHandler) AdminAuthorize(c *gin.Context) {
 
-	isAdmin, _ := c.Get("isAdmin")
+	isAdmin, _ := c.Get(utils.MiddlewareUserRoleKey)
 	//if !ok {
 	//	utils.HandleError(c, http.StatusInternalServerError, errors.New("cannot get role in middleware"))
 	//	return

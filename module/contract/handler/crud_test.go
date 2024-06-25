@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -13,7 +12,6 @@ import (
 	"glintecoTask/module/user/usecase"
 	"glintecoTask/test"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 )
 
@@ -23,7 +21,7 @@ func SetupRouter() *gin.Engine {
 	return gin.Default()
 }
 
-func Setup(mockData test.MockData) (*gin.Engine, entity.ITokenUseCase, ContractHandler) {
+func Setup(mockData test.MockData) ContractHandler {
 	jwtSecret, _ := hex.DecodeString(test.JWTSecret)
 	contractRepo := test.NewTestContractRepo(mockData)
 	contractUC := usecase3.NewContractUseCase(contractRepo)
@@ -41,14 +39,12 @@ func Setup(mockData test.MockData) (*gin.Engine, entity.ITokenUseCase, ContractH
 
 	contractHandler, _ := NewContractHandler(router, contractUC, mockKafka)
 
-	return router, tokenUC, contractHandler
+	return contractHandler
 }
 
 func TestContractHandler_CreateNew(t *testing.T) {
 	mockData := test.NewMockData()
-	router, tokenUC, handler := Setup(mockData)
-
-	router.POST(APIPath, handler.CreateNew)
+	handler := Setup(mockData)
 
 	tests := []struct {
 		name   string
@@ -114,23 +110,17 @@ func TestContractHandler_CreateNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, _ := tokenUC.Create(tt.user)
-			token = "Bearer " + token
+			mock := test.NewMockGinContext()
+			mock.SetMiddleware(tt.user)
 
-			var jsonValue []byte
-			if tt.new != nil {
-				jsonValue, _ = json.Marshal(tt.new)
-			}
-			req, _ := http.NewRequest("POST", APIPath, bytes.NewBuffer(jsonValue))
-			req.Header.Set("Authorization", token)
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
+			mock.Post(tt.new)
+			mock.RunTest(handler.CreateNew)
 
-			assert.Equal(t, tt.status, w.Code)
+			assert.Equal(t, tt.status, mock.ResponseStatus())
 
 			if tt.status == http.StatusOK {
 				var res entity.Contract
-				json.Unmarshal(w.Body.Bytes(), &res)
+				json.Unmarshal(mock.ResponseBody(), &res)
 				assert.NotEmpty(t, res)
 			}
 		})
@@ -139,9 +129,7 @@ func TestContractHandler_CreateNew(t *testing.T) {
 
 func TestContractHandler_Delete(t *testing.T) {
 	mockData := test.NewMockData()
-	router, tokenUC, handler := Setup(mockData)
-
-	router.DELETE(APIPath+":uuid", handler.Delete)
+	handler := Setup(mockData)
 
 	tests := []struct {
 		name         string
@@ -185,33 +173,35 @@ func TestContractHandler_Delete(t *testing.T) {
 			"invalid-contract-uuid",
 			http.StatusNoContent,
 		},
-		{
-			"Malicious user",
-			mockData.InvalidUser,
-			mockData.AdminContractsUuid()[0],
-			http.StatusBadRequest,
-		},
+		//{ this is middleware test
+		//	"Malicious user",
+		//	mockData.InvalidUser,
+		//	mockData.AdminContractsUuid()[0],
+		//	http.StatusBadRequest,
+		//},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, _ := tokenUC.Create(tt.user)
-			token = "Bearer " + token
+			mock := test.NewMockGinContext()
+			mock.SetMiddleware(tt.user)
 
-			req, _ := http.NewRequest("DELETE", APIPath+tt.contractUuid, nil)
-			req.Header.Set("Authorization", token)
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
+			params := []gin.Param{
+				{
+					Key:   "uuid",
+					Value: tt.contractUuid,
+				},
+			}
+			mock.Delete(params)
+			mock.RunTest(handler.Delete)
 
-			assert.Equal(t, tt.status, w.Code)
+			assert.Equal(t, tt.status, mock.ResponseStatus())
 		})
 	}
 }
 
 func TestContractHandler_GetDetails(t *testing.T) {
 	mockData := test.NewMockData()
-	router, tokenUC, handler := Setup(mockData)
-
-	router.GET(APIPath+":uuid", handler.GetDetails)
+	handler := Setup(mockData)
 
 	tests := []struct {
 		name         string
@@ -258,19 +248,24 @@ func TestContractHandler_GetDetails(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, _ := tokenUC.Create(tt.user)
-			token = "Bearer " + token
+			mock := test.NewMockGinContext()
+			mock.SetMiddleware(tt.user)
 
-			req, _ := http.NewRequest("GET", APIPath+tt.contractUuid, nil)
-			req.Header.Set("Authorization", token)
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
+			params := []gin.Param{
+				{
+					Key:   "uuid",
+					Value: tt.contractUuid,
+				},
+			}
 
-			assert.Equal(t, tt.status, w.Code)
+			mock.Get(params, nil)
+			mock.RunTest(handler.GetDetails)
+
+			assert.Equal(t, tt.status, mock.ResponseStatus())
 
 			if tt.status == http.StatusOK {
 				var res entity.Contract
-				json.Unmarshal(w.Body.Bytes(), &res)
+				json.Unmarshal(mock.ResponseBody(), &res)
 				assert.NotEmpty(t, res)
 			}
 		})
@@ -279,9 +274,7 @@ func TestContractHandler_GetDetails(t *testing.T) {
 
 func TestContractHandler_GetList(t *testing.T) {
 	mockData := test.NewMockData()
-	router, tokenUC, handler := Setup(mockData)
-
-	router.GET(APIPath, handler.GetList)
+	handler := Setup(mockData)
 
 	tests := []struct {
 		name   string
@@ -298,27 +291,19 @@ func TestContractHandler_GetList(t *testing.T) {
 			mockData.Staff,
 			http.StatusOK,
 		},
-		{
-			"Malicious user",
-			mockData.InvalidUser,
-			http.StatusBadRequest,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, _ := tokenUC.Create(tt.user)
-			token = "Bearer " + token
+			mock := test.NewMockGinContext()
+			mock.SetMiddleware(tt.user)
+			mock.Get(nil, nil)
+			mock.RunTest(handler.GetList)
 
-			req, _ := http.NewRequest("GET", APIPath, nil)
-			req.Header.Set("Authorization", token)
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
-
-			assert.Equal(t, tt.status, w.Code)
+			assert.Equal(t, tt.status, mock.ResponseStatus())
 
 			if tt.status == http.StatusOK {
 				var res []entity.Contract
-				json.Unmarshal(w.Body.Bytes(), &res)
+				json.Unmarshal(mock.ResponseBody(), &res)
 				assert.NotEmpty(t, res)
 			}
 		})
@@ -327,9 +312,7 @@ func TestContractHandler_GetList(t *testing.T) {
 
 func TestContractHandler_UpdateContract(t *testing.T) {
 	mockData := test.NewMockData()
-	router, tokenUC, handler := Setup(mockData)
-
-	router.PUT(APIPath+":uuid", handler.UpdateContract)
+	handler := Setup(mockData)
 
 	tests := []struct {
 		name   string
@@ -405,32 +388,23 @@ func TestContractHandler_UpdateContract(t *testing.T) {
 			nil,
 			http.StatusBadRequest,
 		},
-		{
-			"Malicious user",
-			mockData.InvalidUser,
-			mockData.StaffContractsUuid()[0],
-			&entity.UpdateContractRequest{
-				Name:        "update contract",
-				Description: "update description",
-			},
-			http.StatusBadRequest,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, _ := tokenUC.Create(tt.user)
-			token = "Bearer " + token
+			mock := test.NewMockGinContext()
+			mock.SetMiddleware(tt.user)
 
-			var jsonValue []byte
-			if tt.req != nil {
-				jsonValue, _ = json.Marshal(tt.req)
+			params := []gin.Param{
+				{
+					Key:   "uuid",
+					Value: tt.cUuid,
+				},
 			}
-			req, _ := http.NewRequest("PUT", APIPath+tt.cUuid, bytes.NewBuffer(jsonValue))
-			req.Header.Set("Authorization", token)
-			w := httptest.NewRecorder()
-			router.ServeHTTP(w, req)
 
-			assert.Equal(t, tt.status, w.Code)
+			mock.Put(tt.req, params)
+			mock.RunTest(handler.UpdateContract)
+
+			assert.Equal(t, tt.status, mock.ResponseStatus())
 		})
 	}
 }
