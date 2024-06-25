@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
 	"glintecoTask/entity"
+	"glintecoTask/kafka"
 	cH "glintecoTask/module/contract/handler"
 	cRepo "glintecoTask/module/contract/repository"
 	cUC "glintecoTask/module/contract/usecase"
@@ -107,10 +108,11 @@ func main() {
 	userHandler := uH.NewUserHandler(app, userUseCase)
 	userHandler.RegisterHandler(tokenHandler.Authenticate, tokenHandler.AdminAuthorize)
 
+	kafkaService := kafka.NewKafkaService(kafkaConfig)
 	// contract
 	cRepository := cRepo.NewContractRepository(db)
 	cUseCase := cUC.NewContractUseCase(cRepository)
-	cHandler, err := cH.NewContractHandler(app, cUseCase, kafkaConfig)
+	cHandler, err := cH.NewContractHandler(app, cUseCase, kafkaService)
 	if err != nil {
 		panic(err)
 	}

@@ -23,17 +23,20 @@ func (h KafkaDeleteContractHandler) ConsumeClaim(sess sarama.ConsumerGroupSessio
 		var deleteMsg entity.KafkaContractDeleteMessage
 		err := json.Unmarshal(msg.Value, &deleteMsg)
 		if err != nil {
+			sess.MarkMessage(msg, "")
 			return err
 		}
 
 		if deleteMsg.ActionUserIsAdmin {
 			err = h.uc.Delete(deleteMsg.ContractUuid)
 			if err != nil {
+				sess.MarkMessage(msg, "")
 				return err
 			}
 		} else {
 			err = h.uc.DeleteByUser(deleteMsg.ContractUuid, deleteMsg.ActionUserUuid)
 			if err != nil {
+				sess.MarkMessage(msg, "")
 				return err
 			}
 		}

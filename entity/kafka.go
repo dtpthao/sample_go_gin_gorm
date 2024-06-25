@@ -1,5 +1,7 @@
 package entity
 
+import "github.com/IBM/sarama"
+
 type KafkaConfig struct {
 	BrokerHost      string
 	BrokerPort      string
@@ -7,7 +9,8 @@ type KafkaConfig struct {
 }
 
 type IKafkaService interface {
-	Post(topic string, jsonMsg []byte) error
+	Init(topics []string, consumerHandler sarama.ConsumerGroupHandler) error
+	Post(topic string, msg any) error
 	Listen()
 }
 

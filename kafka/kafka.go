@@ -1,34 +1,56 @@
 package kafka
 
 import (
+	"encoding/json"
 	"github.com/IBM/sarama"
 	"glintecoTask/entity"
+	"glintecoTask/utils/log"
 )
 
 type Service struct {
+	Config   entity.KafkaConfig
 	Producer Producer
 	Consumer Consumer
 }
 
-func NewKafkaService(config entity.KafkaConfig, topics []string, consumerHandler sarama.ConsumerGroupHandler) (*Service, error) {
-	producer, err := NewKafkaProducer(config)
-	if err != nil {
-		return nil, err
-	}
-
-	consumer, err := NewKafkaConsumer(config, topics, consumerHandler)
-	if err != nil {
-		return nil, err
-	}
-	return &Service{*producer, *consumer}, nil
+func NewKafkaService(config entity.KafkaConfig) entity.IKafkaService {
+	service := Service{Config: config}
+	return &service
 }
 
-func (s Service) Post(topic string, jsonMsg []byte) error {
-	return s.Producer.Post(topic, jsonMsg)
+func (s *Service) Init(topics []string, consumerHandler sarama.ConsumerGroupHandler) error {
+	producer, err := NewKafkaProducer(s.Config)
+	if err != nil {
+		return err
+	}
+
+	consumer, err := NewKafkaConsumer(s.Config, topics, consumerHandler)
+	if err != nil {
+		return err
+	}
+
+	*s = Service{
+		Config:   s.Config,
+		Producer: *producer,
+		Consumer: *consumer,
+	}
+	return nil
 }
 
-func (s Service) Listen() {
+func (s *Service) Post(topic string, msg any) error {
+	value, err := json.Marshal(&msg)
+	if err != nil {
+		return err
+	}
+
+	return s.Producer.Post(topic, value)
+}
+
+func (s *Service) Listen() {
 	for {
-		s.Consumer.Consume()
+		err := s.Consumer.Consume()
+		if err != nil {
+			log.Error().Err(err)
+		}
 	}
 }

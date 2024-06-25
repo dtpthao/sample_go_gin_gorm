@@ -34,10 +34,14 @@ func Setup(mockData test.MockData) (*gin.Engine, entity.ITokenUseCase, ContractH
 
 	router := SetupRouter()
 
-	thandler := handler2.NewTokenHandler(tokenUC, userUC, jwtSecret)
-	router.Use(thandler.Authenticate)
+	tHandler := handler2.NewTokenHandler(tokenUC, userUC, jwtSecret)
+	router.Use(tHandler.Authenticate)
 
-	return router, tokenUC, NewContractHandler(router, contractUC)
+	mockKafka := test.MockKafka{}
+
+	contractHandler, _ := NewContractHandler(router, contractUC, mockKafka)
+
+	return router, tokenUC, contractHandler
 }
 
 func TestContractHandler_CreateNew(t *testing.T) {
@@ -53,10 +57,21 @@ func TestContractHandler_CreateNew(t *testing.T) {
 		status int
 	}{
 		{
-			"Admin Success",
+			"Admin create their own contract",
 			mockData.Admin,
 			&entity.NewContractRequest{
 				Name:        "New Contract",
+				UserUuid:    mockData.Admin.Uuid,
+				Description: "New contract description",
+			},
+			http.StatusOK,
+		},
+		{
+			"Admin create contract for staff",
+			mockData.Admin,
+			&entity.NewContractRequest{
+				Name:        "New Contract",
+				UserUuid:    mockData.Staff.Uuid,
 				Description: "New contract description",
 			},
 			http.StatusOK,
@@ -66,9 +81,20 @@ func TestContractHandler_CreateNew(t *testing.T) {
 			mockData.Staff,
 			&entity.NewContractRequest{
 				Name:        "New Contract",
+				UserUuid:    mockData.Staff.Uuid,
 				Description: "New contract description",
 			},
 			http.StatusOK,
+		},
+		{
+			"Staff create contract for other",
+			mockData.Staff,
+			&entity.NewContractRequest{
+				Name:        "New Contract",
+				UserUuid:    mockData.Admin.Uuid,
+				Description: "New contract description",
+			},
+			http.StatusBadRequest,
 		},
 		{
 			"Invalid request body",
@@ -139,7 +165,7 @@ func TestContractHandler_Delete(t *testing.T) {
 			"Admin delete non-exist contract",
 			mockData.Admin,
 			"invalid-contract-uuid",
-			http.StatusInternalServerError,
+			http.StatusNoContent,
 		},
 		{
 			"Staff delete their contract",
@@ -151,13 +177,13 @@ func TestContractHandler_Delete(t *testing.T) {
 			"Staff delete someone else's contract",
 			mockData.Staff,
 			mockData.AdminContractsUuid()[1],
-			http.StatusInternalServerError,
+			http.StatusNoContent,
 		},
 		{
 			"Staff delete non-exist contract",
 			mockData.Staff,
 			"invalid-contract-uuid",
-			http.StatusInternalServerError,
+			http.StatusNoContent,
 		},
 		{
 			"Malicious user",
