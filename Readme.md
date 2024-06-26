@@ -1,5 +1,6 @@
 # Instruction
 
+An example of Golang server with Clean Architecture, JWT Authentication, Permission, Gin, Gorm, Mysql, Docker, Unittest, REST API and Kafka background.
 
 ## How to run:
 ### Run app on local machine:
