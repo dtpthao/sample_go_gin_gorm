@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"sample-go-server/entity"
-	"sample-go-server/kafka"
 	cH "sample-go-server/module/contract/handler"
 	cRepo "sample-go-server/module/contract/repository"
 	cUC "sample-go-server/module/contract/usecase"
@@ -19,6 +18,7 @@ import (
 	uH "sample-go-server/module/user/handler"
 	uRepo "sample-go-server/module/user/repository"
 	uUC "sample-go-server/module/user/usecase"
+	"sample-go-server/services/kafka"
 	apiLog "sample-go-server/utils/log"
 	"time"
 )
